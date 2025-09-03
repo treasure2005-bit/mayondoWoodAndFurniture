@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MWF - Record Sale</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <div class="navbar">
+    <a href="sales.html">BACK</a>
+    <a href="login.html">LOGOUT</a>
+  </div>
+  <div class="container">
+    <h2 style="margin-right: 900px;">RECORD SALE</h2>
+    <form onsubmit="return recordSale(event)">
+      <input type="text" id="customerName" placeholder="Customer Name" required>
+      <input type="text" id="productType" placeholder="Product Type" required>
+      <input type="text" id="productNameSale" placeholder="Product Name" required>
+      <input type="number" id="quantitySold" placeholder="Quantity Sold" required>
+      <select id="paymentType" required>
+        <option value="">Payment Type</option>
+        <option value="cash">Cash</option>
+        <option value="cheque">Cheque</option>
+        <option value="bank">Bank Overdraft</option>
+      </select>
+      <label>
+        <input type="checkbox" id="transport"><b> Transport Required (+5%)
+      </label>
+      <button type="submit">Submit Sale</button>
+    </form>
+
+    <h3>SALES RECORDS</h3>
+    <table id="salesTable">
+      <tr>
+        <th>Customer</th><th>Product</th><th>Qty</th><th>Total</th><th>Payment</th>
+      </tr>
+    </table>
+  </div>
+  <script src="../js/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MWF - Stock Management</title>
+    <link rel="stylesheet" href="../css/style.css" />
+  </head>
+  <body>
+    <div class="navbar">
+      <a href="manager.html">BACK</a>
+      <a href="login.html">LOGOUT</a>
+    </div>
+    <div class="container">
+      <h2 style="margin-right: 900px;">STOCK MANAGEMENT</h2>
+      <form onsubmit="return addStock(event)">
+        <input
+          type="text"
+          id="productName"
+          placeholder="Product Name"
+          required
+        />
+        <input type="text" id="productType" placeholder="Type" required />
+        <input type="number" id="costPrice" placeholder="Cost Price" required />
+        <input
+          type="number"
+          id="productPrice"
+          placeholder="Quantity"
+          required
+        />
+        <input
+          type="number"
+          id="quantity"
+          placeholder="Product price"
+          required
+        />
+        <input type="text" id="supplier" placeholder="Supplier Name" required />
+        <input type="date" id="date" placeholder="Date" required />
+        <input type="text" id="quality" placeholder="Quality" required />
+        <!-- <input type="color" id="color" placeholder="color" required> -->
+        <input
+          type="number"
+          id="measurement"
+          placeholder="measurement"
+          required
+        />
+        <button type="submit">Add Stock</button>
+      </form>
+
+      <h3>CURRENT STOCK</h3>
+      <table id="stockTable">
+        <tr>
+          <th>NAME</th>
+          <th>TYPE</th>
+          <th>COST</th>
+          <th>QUANTITY</th>
+          <th>PRICE</th>
+          <th>SUPPLIER</th>
+          <th>DATE</th>
+          <th>QUALITY</th>
+        </tr>
+        <tr>
+          <td data-label="NAME">Pine Wood</td>
+          <td data-label="TYPE">Hardwood</td>
+          <td data-label="COST">1000000</td>
+          <td data-label="QUANTITY">75</td>
+          <td data-label="PRICE">2000000</td>
+          <td data-label="SUPPLIER">Upcountry Co.</td>
+          <td data-label="DATE">23/03/2005</td>
+          <td data-label="QUALITY">Medium</td>
+        </tr>
+      </table>
+    </div>
+    <script src="../js/script.js"></script>
+  </body>
+</html>
