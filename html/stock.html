@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>MWF - Stock Management</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="/public/css/style.css" />
   </head>
   <body>
     <div class="navbar">
@@ -12,37 +12,52 @@
       <a href="login.html">LOGOUT</a>
     </div>
     <div class="container">
-      <h2 style="margin-right: 900px;">STOCK MANAGEMENT</h2>
-      <form onsubmit="return addStock(event)">
+      <h2 style="margin-right: 900px">STOCK MANAGEMENT</h2>
+      <form onsubmit="return addStock(event)" action="/stock" method="post">
         <input
           type="text"
           id="productName"
-          placeholder="Product Name"
+          placeholder="productName"
           required
+          name="productName"
         />
-        <input type="text" id="productType" placeholder="Type" required />
-        <input type="number" id="costPrice" placeholder="Cost Price" required />
+        <input
+          type="text"
+          id="productType"
+          placeholder="Type"
+          required
+          name="productType"
+        />
+        <input
+          type="number"
+          id="costPrice"
+          placeholder="costPrice"
+          required
+          name="costPrice"
+        />
         <input
           type="number"
           id="productPrice"
-          placeholder="Quantity"
+          placeholder="productPrice"
           required
+          name="productPrice"
         />
         <input
           type="number"
           id="quantity"
-          placeholder="Product price"
+          placeholder="quantity"
           required
         />
-        <input type="text" id="supplier" placeholder="Supplier Name" required />
-        <input type="date" id="date" placeholder="Date" required />
-        <input type="text" id="quality" placeholder="Quality" required />
-        <!-- <input type="color" id="color" placeholder="color" required> -->
+        <input type="text" id="supplier" placeholder="supplierName" required name="supplierName" />
+        <input type="date" id="date" placeholder="date" required name="date" />
+        <input type="text" id="quality" placeholder="quality" required name="quality" />
+        <input type="color" id="color" placeholder="color" required name="color" />
         <input
           type="number"
           id="measurement"
           placeholder="measurement"
           required
+          name="measurement"
         />
         <button type="submit">Add Stock</button>
       </form>
@@ -71,6 +86,6 @@
         </tr>
       </table>
     </div>
-    <script src="script.js"></script>
+    <script src="/public/js/script.js"></script>
   </body>
 </html>

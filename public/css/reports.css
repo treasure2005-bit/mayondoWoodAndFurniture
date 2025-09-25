@@ -1,0 +1,104 @@
+/* Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* General Page Layout */
+body {
+  background-image: url("/images/landingpage.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed; 
+  font-family: Arial, sans-serif;
+  color: #000;
+  min-height: 100vh; 
+  display: flex;
+  flex-direction: column;
+}
+
+/* Navbar */
+.navbar {
+  width: 100%;
+  background: #d6d6d6;
+  padding: 12px 20px;
+  display: flex;
+  justify-content: flex-start;
+  gap: 20px;
+}
+
+.navbar a {
+  color: #10355e;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.navbar a:hover {
+  text-decoration: underline;
+}
+
+/* Container for all reports */
+.container {
+  max-width: 1200px;
+  margin: 40px auto;
+  padding: 20px;
+  background: #cfe4f9; /* soft blue background like your stock page */
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Main Page Title */
+.container h2 {
+  font-size: 22px;
+  text-align: center;
+  margin-bottom: 25px;
+  text-transform: uppercase;
+  font-weight: bold;
+  color: #10355e;
+}
+
+/* Section Headings */
+.container h3 {
+  font-size: 16px;
+  margin: 20px 0 10px;
+  font-weight: bold;
+  color: #000;
+  border-bottom: 2px solid #999;
+  padding-bottom: 4px;
+}
+
+/* Tables */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 30px;
+  font-size: 13px;
+  background: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+table th,
+table td {
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: left;
+}
+
+table th {
+  background: #973078;
+  color: #fff;
+  font-weight: bold;
+}
+
+table tbody tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+table tbody tr:hover {
+  background-color: #eef6ff;
+  transition: 0.3s;
+}

@@ -1,0 +1,54 @@
+doctype html
+html
+  head
+    title Edit Supplier
+    link(rel="stylesheet" href="/css/suppliers.css")
+      
+  body
+    .nav-bar
+      a(href="/dashboard") BACK
+      a(href="/login") LOGOUT
+    
+    .container
+      .card
+        .card-header Edit Supplier
+        
+        form(method="POST" action=`/editSupplier/${supplier._id}`)
+          .form-row
+            .form-group
+              label Supplier Name:
+              input(type="text" name="name" value=supplier.name required)
+            
+            .form-group
+              label Contact Person:
+              input(type="text" name="contact" value=supplier.contact required)
+            
+            .form-group
+              label Phone:
+              input(type="tel" name="phone" value=supplier.phone required)
+            
+            .form-group
+              label Location:
+              input(type="text" name="location" value=supplier.location required)
+          
+          .form-row
+            .form-group
+              label Wood Types:
+              select(name="woodType" required)
+                option(value="") Select Wood Type
+                option(value="timber" selected=(supplier.woodType=="timber")) Timber
+                option(value="poles" selected=(supplier.woodType=="poles")) Poles  
+                option(value="hardwood" selected=(supplier.woodType=="hardwood")) Hardwood
+                option(value="softwood" selected=(supplier.woodType=="softwood")) Softwood
+                option(value="plywood" selected=(supplier.woodType=="plywood")) Plywood
+            
+            .form-group
+              label Payment Terms:
+              select(name="payment" required)
+                option(value="") Select Payment Terms
+                option(value="cash" selected=(supplier.payment=="cash")) Cash on Delivery
+                option(value="credit_7" selected=(supplier.payment=="credit_7")) Credit (7 days)
+                option(value="credit_30" selected=(supplier.payment=="credit_30")) Credit (30 days)
+          
+          button.btn.btn-success(type="submit") ✅ UPDATE SUPPLIER
+          a.btn.btn-secondary(href="/suppliersTable") ❌ CANCEL

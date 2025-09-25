@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+  <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="/public/css/style.css">
+    <link rel="stylesheet" href="/public/attendant.css"> 
+    </head>
+<body>
+    <div class="navbar">
+    <h2>ATTENDANT'S DASHBOARD</h2>
+    <a href="attendantstock.html">RECORD STOCK</a>
+    <a href="record-sale.html">RECORD SALES</a>
+    <a href="productsTable.html">PRODUCTS TABLE</a>
+    <a href="loading.html">LOADING ITEMS</a>
+    <a href="offLoading.html">OFFLOADING ITEMS</a>
+    <a href="attendant.html">BACK</a>
+    <a href="login.html">LOGOUT</a>
+    </div>
+  <div id="sales" class="tab-content">
+            <h3>Record Sales</h3>
+            <form id="salesForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="customerName">Customer Name:</label>
+                        <input type="text" id="customerName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="salesProductType">Product Type:</label>
+                        <select id="salesProductType" required>
+                            <option value="">Select Type</option>
+                            <option value="timber">Timber</option>
+                            <option value="poles">Poles</option>
+                            <option value="hardwood">Hard Wood</option>
+                            <option value="softwood">Soft Wood</option>
+                            <option value="furniture">Furniture</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="salesProductName">Product Name:</label>
+                        <input type="text" id="salesProductName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="salesQuantity">Quantity Sold:</label>
+                        <input type="number" id="salesQuantity" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="unitPrice">Unit Price:</label>
+                        <input type="number" id="unitPrice" step="0.01" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="salesDate">Date:</label>
+                        <input type="date" id="salesDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="paymentType">Payment Type:</label>
+                        <select id="paymentType" required>
+                            <option value="">Select Payment</option>
+                            <option value="cash">Cash</option>
+                            <option value="cheque">Cheque</option>
+                            <option value="bank_overdraft">Bank Overdraft</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="salesAgent">Sales Agent:</label>
+                        <input type="text" id="salesAgent" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                        <input type="checkbox" id="transportService"> 
+                    <span>Company provides transport (+5%)</span>
+                </div>
+                <button type="submit" class="btn btn-primary">Record Sale</button>
+                <button type="button" class="btn btn-success" onclick="generateSalesReport()">Generate Sales Report</button>
+            </form>
+<table id="salesTable">
+                <thead>
+                    <tr>
+                        <th>Customer</th>
+                        <th>Product</th>
+                        <th>Type</th>
+                        <th>Quantity</th>
+                        <th>Unit Price</th>
+                        <th>Total</th>
+                        <th>Date</th>
+                        <th>Payment</th>
+                        <th>Agent</th>
+                    </tr>
+                </thead>
+                <tbody id="salesTableBody">
+                </tbody>
+            </table>
+<div id="receipt" class="tab-content">
+            <h3>Generate Receipt</h3>
+            <form id="receiptForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="receiptCustomer">Customer Name:</label>
+                        <input type="text" id="receiptCustomer" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="receiptSaleId">Sale Reference/ID:</label>
+                        <input type="text" id="receiptSaleId" placeholder="Or select from recent sales">
+                    </div>
+                </div>
+                <button type="button" class="btn btn-info" onclick="generateReceipt()">Generate Receipt</button>
+                <button type="button" class="btn btn-success" onclick="printReceipt()">Print Receipt</button>
+            </form>
+
+            <!-- Receipt Display -->
+            <div id="receiptDisplay" style="display: none; margin-top: 20px; padding: 20px; border: 2px solid #333;">
+                <div style="text-align: center;">
+                    <h2>Mayondo Wood and Furniture (MWF) Ltd</h2>
+                    <p>B2B Wood and Furniture Company</p>
+                    <hr>
+                </div>
+                <div id="receiptContent"></div>
+            </div>
+        </div>
+    </div>
+            <!-- Sales Report Section -->
+            <div id="salesReportSection" class="report-section" style="display: none;">
+                <h4>Sales Report Generated</h4>
+                <p>Sales report has been generated and saved for manager review.</p>
+                <p>Report ID: <span id="salesReportId"></span></p>
+                <p>Generated on: <span id="salesReportDate"></span></p>
+            </div>
+        </div>
+        
+</body>
+</html>
+<script src="/public/js/attendant.js"></script>

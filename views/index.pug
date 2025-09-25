@@ -1,0 +1,54 @@
+doctype html
+head
+  meta(charset='UTF-8')
+  meta(name='viewport' content='width=device-width, initial-scale=1.0')
+  title MWF - Welcome
+  link(rel='stylesheet' href='/css/style.css')
+  style.
+    .landing {
+    background: url("/images/landingpage.jpg") no-repeat center center/cover;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    }
+    .container {
+    max-width: 800px;
+    background: rgba(255, 255, 255, 0.8); /* optional: make text readable */
+    padding: 30px;
+    border-radius: 10px;
+    }
+    h1 {
+    font-size: 2rem;
+    color: #004080;
+    margin-bottom: 20px;
+    }
+    p {
+    font-size: 1.2rem;
+    line-height: 1.6;
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    margin-bottom: 20px;
+    }
+    button {
+    padding: 10px 20px;
+    font-size: 1rem;
+    border: none;
+    border-radius: 5px;
+    background: #800080;
+    color: white;
+    cursor: pointer;
+    }
+    button:hover {
+    background: #5a005a;
+    }
+.landing
+  .container
+    h1 WELCOME TO MAYONDO WOOD AND FURNITURE
+    p
+      | MWF is a B2B wood and furniture company, sourcing timber, poles, and both hard
+      | and soft woods from up-country suppliers and supplying them to construction
+      | companies and furniture dealers. We also run a furniture workshop producing
+      | beds, sofas, dining tables, cupboards, drawers, and office furniture, with a
+      | showroom and warehouse to ensure quality products and efficient service.
+    button(onclick="window.location.href='/login'") Next

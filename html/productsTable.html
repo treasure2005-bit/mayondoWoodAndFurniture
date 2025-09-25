@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Products / Stock - MWF</title>
+    <link rel="stylesheet" href="/public/css/style.css" />
+    <link rel="stylesheet" href="/public/attendant.css" />
+  </head>
+  <body>
+    <div class="navbar">
+    <h2>ATTENDANT'S DASHBOARD</h2>
+    <a href="attendantstock.html">RECORD STOCK</a>
+    <a href="recordingSales.html">RECORD SALES</a>
+    <a href="productsTable.html">PRODUCTS TABLE</a>
+    <a href="loading.html">LOADING ITEMS</a>
+    <a href="offLoading.html">OFFLOADING ITEMS</a>
+    <a href="attendant.html">BACK</a>
+    <a href="login.html">LOGOUT</a>
+    <div class="container">
+      <h2>Products / Stock</h2>
+
+      <form id="addProductForm">
+        <input type="text" id="name" placeholder="Product Name" required />
+        <input
+          type="text"
+          id="type"
+          placeholder="Type (Wood/Furniture)"
+          required
+        />
+        <input type="number" id="stock" placeholder="Stock Quantity" required />
+        <input type="number" id="cost" placeholder="Cost Price" required />
+        <input type="number" id="price" placeholder="Product Price" required />
+        <button type="submit" class="btn">Add / Update Product</button>
+      </form>
+
+      <table id="productTable">
+        <thead>
+          <tr>
+            <th>NAME</th>
+            <th>TYPE</th>
+            <th>STOCK</th>
+            <th>COST PRICE</th>
+            <th>PRODUCT PRICE</th>
+            <th>ACTIONS</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <script src="app.js"></script>
+  </body>
+</html>

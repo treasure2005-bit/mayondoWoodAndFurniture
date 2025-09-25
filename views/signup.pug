@@ -1,0 +1,25 @@
+doctype html
+html
+  head
+    meta(charset='UTF-8')
+    meta(name='viewport' content='width=device-width, initial-scale=1.0')
+    title Sign Up Page
+    link(rel='stylesheet' href='/css/style.css')
+  body
+    .login-box
+      h2 SIGN UP
+      form(action='/signup' method='post')
+        select#role(name='role' required='')
+          option(value='') Select Role
+          option(value='Manager') Manager
+          option(value='Attendant') Attendant
+        input#email(type='email' name='email' placeholder='Enter your email' required)
+        input#phone(type='text' name='phoneNumber' placeholder='Enter your phone number' required)
+        input#password(type='password' name='password' placeholder='Enter password' required)
+        input#confirmPassword(type='password' name='confirmPassword' placeholder='Confirm password' required)
+        button(type='submit') Sign Up
+      // Login link
+      p(style='margin-top: 15px;')
+        | Already have an account? 
+        a(href='/login' style='color: #0d5d83; text-decoration: none; font-weight: bold;') Login
+    script(src='/js/script.js')

@@ -1,0 +1,48 @@
+doctype html
+html
+  head
+    meta(charset='UTF-8')
+    meta(name='viewport' content='width=device-width, initial-scale=1.0')
+    title Stock Report
+    link(rel='stylesheet', href='/css/stockreport.css')
+  body.a
+    nav.navbar
+    .nav-brand
+    .nav-links
+    .buttons
+      a(href='/attendant')
+        i.fas.fa-home
+        |  Dashboard
+      a.logout(href='/login')
+        i.fas.fa-sign-out-alt
+        |  Logout
+    .container
+      h2 STOCK REPORT
+      table
+        thead
+          tr
+            th Product Name
+            th Product Type
+            th Product Price
+            th Cost Price
+            th Quantity
+            th Supplier Name
+            th Date
+            th Quality
+            th Color
+            th Measurements
+            th Status
+        tbody
+          each item in stock
+            tr
+              td= item.productName
+              td= item.productType
+              td= item.productPrice
+              td= item.costPrice
+              td= item.quantity
+              td= item.supplierName
+              td= item.date.toDateString()
+              td= item.quality
+              td= item.color || '-'
+              td= item.measurement || '-'
+              td= item.status || 'pending'

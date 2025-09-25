@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login Page</title>
+  <link rel="stylesheet" href="/public/css/style.css">
+</head>
+<body>
+  <div class="login-box">
+    <h2>LOGIN</h2>
+    <form onsubmit="return loginUser(event)" action="/login" method="post">
+      <select id="role" name="role" required>
+        <option value="">Select Role</option>
+        <option value="Manager">Manager</option>
+        <option value="Attendant">Attendant</option>
+      </select>
+      
+      <input type="text" id="username" name="username" placeholder="Enter username" required>
+      <input type="password" id="password" name="password" placeholder="Enter password" required>
+      
+      <button type="submit">Login</button>
+    </form>
+
+    <!-- Sign Up Section -->
+    <p style="margin-top: 10px; text-align: center;">
+      Don't have an account? 
+      <a href="/signup" style="color: blue; text-decoration: underline;">Sign Up</a>
+    </p>
+  </div>
+
+  <script src="/public/js/script.js"></script>
+</body>
+</html>

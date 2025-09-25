@@ -1,0 +1,75 @@
+doctype html
+html
+  head
+    meta(charset='UTF-8')
+    meta(name='viewport' content='width=device-width, initial-scale=1.0')
+    title MWF - MANAGER VIEW REPORTS
+    link(rel='stylesheet', href='/css/reports.css')
+    link(rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css')
+  body
+    .navbar
+      a(href='/dashboard')
+        i.fas.fa-home
+        span DASHBOARD
+      a(href='/login')
+        i.fas.fa-sign-out-alt
+        span LOGOUT
+      
+    .container
+      h2 REPORTS
+
+      
+      h3 STOCK REPORT
+      table
+        thead
+          tr
+            th Manager
+            th Manager ID
+            th Date
+            th Product Name
+            th Product Type
+            th Cost Price
+            th Product Price
+            th Quantity
+            th Supplier
+            th Quality
+            th Color
+            th Measurement
+            th Status
+        tbody
+          each item in stock
+            tr
+              td= item.managerName
+              td= item.managerId
+              td= item.date.toDateString()
+              td= item.productName
+              td= item.productType
+              td= item.costPrice
+              td= item.productPrice
+              td= item.quantity
+              td= item.supplierName
+              td= item.quality
+              td= item.color
+              td= item.measurement
+              td= item.status
+
+      
+      h3 SALES REPORT
+      table
+        thead
+          tr
+            th Customer
+            th Product Type
+            th Product Name
+            th Qty Sold
+            th Unit Price
+            th Payment Type
+        tbody
+          each sale in sales
+            tr
+              td= sale.customerName
+              td= sale.productType
+              td= sale.productName
+              td= sale.quantitySold
+              td= sale.unitPrice
+              td= sale.paymentType

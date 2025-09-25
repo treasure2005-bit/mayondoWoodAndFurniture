@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MWF Attendant Dashboard</title>
+    <link rel="stylesheet" href="/public/css/style.css">
+    <link rel="stylesheet" href="/public/attendant.css">
+</head>
+<body>
+    <div class="navbar">
+    <h2>ATTENDANT'S DASHBOARD</h2>
+    <a href="attendantstock.html">RECORD STOCK</a>
+    <a href="recordingSales.html">RECORD SALES</a>
+    <a href="productsTable.html">PRODUCTS TABLE</a>
+    <a href="loading.html">LOADING ITEMS</a>
+    <a href="offLoading.html">OFFLOADING ITEMS</a>
+    <a href="attendant.html">BACK</a>
+    <a href="login.html">LOGOUT</a>
+  </div>
+</body>
+<div id="loading" class="tab-content">
+            <h3>Loading Items</h3>
+            <form id="loadingForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="loadProductName">Product Name:</label>
+                        <input type="text" id="loadProductName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="loadQuantity">Quantity Loading:</label>
+                        <input type="number" id="loadQuantity" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="loadDestination">Destination:</label>
+                        <input type="text" id="loadDestination" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="loadDate">Loading Date:</label>
+                        <input type="date" id="loadDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="loadVehicle">Vehicle/Transport:</label>
+                        <input type="text" id="loadVehicle" required>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">Record Loading</button>
+            </form>
+
+            <!-- Loading Table -->
+            <table id="loadingTable">
+                <thead>
+                    <tr>
+                        <th>Product Name</th>
+                        <th>Quantity</th>
+                        <th>Destination</th>
+                        <th>Date</th>
+                        <th>Vehicle</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="loadingTableBody">
+                </tbody>
+            </table>
+        </div>
+
+</html>

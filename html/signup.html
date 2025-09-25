@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign Up Page</title>
+  <link rel="stylesheet" href="/public/css/style.css">
+</head>
+<body>
+  <div class="signup-box">
+    <h2 style="margin-right: 300px;">SIGN UP</h2>
+    <form action="/signup" method="post">
+        <select id="role" name="role" required>
+        <option value="">Select Role</option>
+        <option value="Manager">Manager</option>
+        <option value="Attendant">Attendant</option>
+      </select>
+      <input type="email" id="email" name="email" placeholder="Enter your email" required>
+      <input type="text" id="phone" name="phone" placeholder="Enter your phone number" required>
+      <input type="password" id="password" name="password" placeholder="Enter password" required>
+      <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm password" required>
+      
+      <button type="submit" style="margin-right: 500px;">Sign Up</button>
+    </form>
+
+    <!-- Login link -->
+    <p style="margin-right: 500px; text-align: center;">
+       Already have an account? 
+       <a href="/login" style="color: blue; text-decoration: underline;">Login</a>
+   
+  </div>
+
+  <script src="/public/js/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,61 @@
+doctype html
+html
+  head
+    meta(charset='UTF-8')
+    meta(name='viewport' content='width=device-width, initial-scale=1.0')
+    title MWF - Edit Stock
+    link(rel='stylesheet' href='/css/edit-stock.css')
+  body
+    .navbar
+      a(href='/stocklist')  BACK TO STOCK LIST
+      a(href='/dashboard') DASHBOARD
+      a(href='/logout') LOGOUT
+
+    .container
+      h2 📝 EDIT STOCK ITEM
+
+      .form-container
+        form(action=`/editStock/${item._id}`, method='post')
+          .form-group
+            label(for='productName') Product Name
+            input#productName(type='text' required name='productName' value=item.productName placeholder='Product Name')
+          
+          .form-group
+            label(for='productType') Product Type
+            input#productType(type='text' required name='productType' value=item.productType placeholder='Type')
+          
+          .form-group
+            label(for='costPrice') Cost Price (UGX)
+            input#costPrice(type='number' step='0.01' required name='costPrice' value=item.costPrice placeholder='Cost Price')
+          
+          .form-group
+            label(for='productPrice') Selling Price (UGX)
+            input#productPrice(type='number' step='0.01' required name='productPrice' value=item.productPrice placeholder='Selling Price')
+          
+          .form-group
+            label(for='quantity') Quantity
+            input#quantity(type='number' required name='quantity' value=item.quantity placeholder='Quantity')
+          
+          .form-group
+            label(for='supplier') Supplier Name
+            input#supplier(type='text' required name='supplierName' value=item.supplierName placeholder='Supplier Name')
+          
+          .form-group
+            label(for='date') Date Bought
+            input#date(type='date' required name='date' value=item.date ? item.date.toISOString().split('T')[0] : '')
+          
+          .form-group
+            label(for='quality') Quality
+            input#quality(type='text' required name='quality' value=item.quality placeholder='Quality')
+          
+          .form-group
+            label(for='color') Color
+            input#color(type='color' required name='color' value=item.color)
+          
+          .form-group
+            label(for='measurement') Measurement
+            input#measurement(type='number' step='0.01' required name='measurement' value=item.measurement placeholder='Measurement')
+          
+          .form-actions
+            button.btn.btn-primary(type='submit') ✅ UPDATE STOCK
+            a.btn.btn-secondary(href='/stocklist') ❌ CANCEL

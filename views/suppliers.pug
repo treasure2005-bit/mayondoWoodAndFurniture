@@ -1,0 +1,98 @@
+doctype html
+html
+  head
+    title Manage Suppliers
+    link(rel="stylesheet" href="/css/suppliers.css")
+      
+  body
+    .nav-bar
+      a(href="/dashboard") BACK
+      a(href="/login") LOGOUT
+    
+    .container
+      .card
+        .card-header Add New Supplier
+        
+        form(method="POST" action="/suppliers/add")
+          .form-row
+            .form-group
+              label Supplier Name:
+              input(type="text" name="name" required)
+            
+            .form-group
+              label Contact Person:
+              input(type="text" name="contact" required)
+            
+            .form-group
+              label Phone:
+              input(type="tel" name="phone" required)
+            
+            .form-group
+              label Location:
+              input(type="text" name="location" required)
+          
+          .form-row
+            .form-group
+              label Wood Types:
+              select(name="woodType" required)
+                option(value="") Select Wood Type
+                option(value="timber") Timber
+                option(value="poles") Poles  
+                option(value="hardwood") Hardwood
+                option(value="softwood") Softwood
+                option(value="plywood") Plywood
+            
+            .form-group
+              label Payment Terms:
+              select(name="payment" required)
+                option(value="") Select Payment Terms
+                option(value="cash") Cash on Delivery
+                option(value="credit_7") Credit (7 days)
+                option(value="credit_30") Credit (30 days)
+          
+          button.btn.btn-success(type="submit") Add Supplier
+      
+      
+      .card
+        .card-header Current Suppliers
+        
+        if suppliers && suppliers.length > 0
+          table
+            thead
+              tr
+                th Name
+                th Contact
+                th Phone
+                th Location  
+                th Wood Type
+                th Payment Terms
+                th Date Added
+                th Actions
+            tbody
+              each supplier in suppliers
+                tr
+                  td= supplier.name
+                  td= supplier.contact
+                  td= supplier.phone
+                  td= supplier.location
+                  td= supplier.woodType
+                  td= supplier.payment
+                  td= supplier.createdAt ? supplier.createdAt.toLocaleDateString() : 'N/A'
+                  td
+                    .actions
+                      button.btn.btn-sm.btn-success(onclick=`editSupplier('${supplier._id}')`) EDIT
+                      button.btn.btn-sm.btn-danger(onclick=`deleteSupplier('${supplier._id}')`) DELETE
+        else
+          .no-suppliers No suppliers added yet.
+    
+    script.
+      function editSupplier(id) {
+
+        alert('Edit supplier: ' + id);
+      }
+      
+      function deleteSupplier(id) {
+        if(confirm('Are you sure you want to delete this supplier?')) {
+          window.location.href = '/suppliers/delete/' + id;
+        }
+      }

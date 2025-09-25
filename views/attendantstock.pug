@@ -1,0 +1,68 @@
+doctype html
+head
+  meta(charset='UTF-8')
+  meta(name='viewport' content='width=device-width, initial-scale=1.0')
+  title Document
+  link(rel='stylesheet' href='/css/style.css')
+  link(rel='stylesheet' href='/attendant.css')
+  link(href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css' rel='stylesheet')
+  nav.navbar
+    .nav-brand
+    .nav-links
+    .buttons
+      a(href='/attendant')
+        i.fas.fa-home
+        |  Dashboard
+      a.logout(href='/login')
+        i.fas.fa-sign-out-alt
+        |  Logout
+#stock.tab-content.active
+  h3 RECORD STOCK
+  form#stockForm(action='/attendantstock' method='post')
+    .form-row
+      .form-group
+        label(for='stockProductName') Product Name:
+        select#stockProductName(required name='productName')
+          option(value='') Select Product Name
+          option(value='timber') Timber
+          option(value='poles') Poles
+          option(value='hardwood') Hard Wood
+          option(value='softwood') Soft Wood
+      .form-group
+        label(for='stockProductType') Product Type:
+        select#stockProductType(required name='productType')
+          option(value='') Select Product Type
+          option(value='wood') Wood
+    .form-row
+      .form-group
+        label(for='stockPrice') Product Price:
+        input#stockPrice(type='number' step='1000' required name='productPrice')
+      .form-group
+        label(for='stockCostPrice') Cost Price:
+        input#stockCostPrice(type='number' step='1000' required name='costPrice')
+      .form-group
+        label(for='stockQuantity') Quantity:
+        input#stockQuantity(type='number' required name='quantity')
+    .form-row
+      .form-group
+        label(for='stockSupplier') Supplier Name:
+        input#stockSupplier(type='text' required name='supplierName')
+      .form-group
+        label(for='stockDate') Date:
+        input#stockDate(type='date' required name='date')
+      .form-group
+        label(for='stockQuality') Quality:
+        select#stockQuality(required name='quality')
+          option(value='') Select Quality
+          option(value='premium') Premium
+          option(value='standard') Standard
+          option(value='economy') Economy
+    .form-row
+      .form-group
+        label(for='stockColor') Color (Optional):
+        input#stockColor(type='text' name='color')
+      .form-group
+        label(for='stockMeasurements') Measurements (Optional):
+        input#stockMeasurements(type='text' placeholder='e.g., 2m x 4m x 1cm' name='measurements')
+    button.btn.btn-primary(type='submit') Record Stock
+    button.btn.btn-success(type='button' onclick='generateStockReport()') Generate Stock Report

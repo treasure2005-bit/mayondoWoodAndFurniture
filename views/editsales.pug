@@ -1,0 +1,69 @@
+doctype html
+meta(charset='UTF-8')
+meta(name='viewport' content='width=device-width, initial-scale=1.0')
+title Document
+link(rel='stylesheet' href='/css/style.css')
+link(rel='stylesheet' href='/attendant.css')
+.navbar
+  a(href='/attendantstock') RECORD STOCK
+  a(href='/recordingSales') RECORD SALES
+  a(href='/productsTable') PRODUCTS TABLE
+  a(href='/loading') LOADING ITEMS
+  a(href='/offLoading') OFFLOADING ITEMS
+  a(href='/attendant') BACK
+  a(href='/login') LOGOUT
+#sales.tab-content
+  h3 📝 EDIT SALES
+  form#salesForm(action=`/editSales/${sale._id}` method="post")
+    .form-row
+      .form-group
+        label(for='customerName') Customer Name:
+        input#customerName(type='text' required name="customerName")
+      .form-group
+        label(for='salesProductType') Product Type:
+        select#salesProductType(required name="productType")
+          option(value='') Select Type
+          option(value='wood') Wood
+          option(value='furniture') Furniture
+    .form-row
+      .form-group
+        label(for='salesProductName') Product Name:
+        select#salesProductName(required name="productName")
+          option(value='') Select Type
+          option(value='timber') Timber
+          option(value='poles') Poles
+          option(value='hardwood') Hard Wood
+          option(value='softwood') Soft Wood
+          option(value='beds') Beds
+          option(value='sofa') Sofa
+          option(value='dining tables') Dining Tables
+          option(value='cupboards') Cupboards
+          option(value='drawers') Drawers
+          option(value='home furniture') Home furniture
+          option(value='office furniture') Office furniture
+
+      .form-group
+        label(for='salesQuantity') Quantity Sold:
+        input#salesQuantity(type='number' required name="quantitySold")
+      .form-group
+        label(for='unitPrice') Unit Price:
+        input#unitPrice(type='number' step="1000" required name="unitPrice")
+    .form-row
+      .form-group
+        label(for='salesDate') Date:
+        input#salesDate(type='date' required name="date")
+      .form-group
+        label(for='paymentType') Payment Type:
+        select#paymentType(required name="paymentType")
+          option(value='') Select Payment
+          option(value='cash') Cash
+          option(value='cheque') Cheque
+          option(value='bank_overdraft') Bank Overdraft
+      //- .form-group
+      //-   label(for='salesAgent') Sales Agent:
+      //-   input#salesAgent(type='text' required name="salesAgent")
+    .form-group
+      input#transportService(type='checkbox' name="checkBox")
+      span Company provides transport (+5%)
+    button.btn.btn-primary(type='submit') ✅ UPDATE SALE
+    a.btn.btn-secondary(href='/salesTable') ❌ CANCEL

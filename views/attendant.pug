@@ -1,0 +1,219 @@
+doctype html
+html
+head
+  meta(charset='UTF-8')
+  meta(name='viewport' content='width=device-width, initial-scale=1.0')
+  title MWF - Attendant Dashboard
+  link(rel='stylesheet' href='/attendant.css')
+  link(href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css' rel='stylesheet')
+
+body.dashboard-page
+  nav.navbar
+    .nav-brand
+      h2 ATTENDANT'S DASHBOARD
+    .nav-links
+      a(href='/attendant')
+        i.fas.fa-home
+        |  Dashboard
+      a.logout(href='/login')
+        i.fas.fa-sign-out-alt
+        |  Logout
+        
+  .container.fade-in
+    .welcome-section
+      h1
+        | Welcome Back, 
+        span#attendantName Attendant
+        | !
+      p Manage MWF operations efficiently
+      #currentTime.time-display
+      
+    // Quick Stats
+    .stats-row
+      .stat-card
+        .stat-icon
+          i.fas.fa-cash-register
+        .stat-content
+          .stat-number(data-target='0') 0
+          .stat-label Today's Sales
+      .stat-card
+        .stat-icon
+          i.fas.fa-money-bill-wave
+        .stat-content
+          .stat-number(data-target='0') UGX 0
+          .stat-label Revenue Today
+      .stat-card
+        .stat-icon
+          i.fas.fa-boxes
+        .stat-content
+          .stat-number(data-target='0') 0
+          .stat-label Stock Items
+      .stat-card
+        .stat-icon
+          i.fas.fa-exclamation-triangle
+        .stat-content
+          .stat-number(data-target='0') 0
+          .stat-label Low Stock Alerts
+          
+    // Main Dashboard Grid
+    .dashboard-grid
+      // Sales Management
+      .card.sales-card
+        .card-header
+          .card-icon
+            i.fas.fa-shopping-cart
+          .card-title
+            h3 Sales Management
+            p Record customer sales and generate receipts
+        .card-content
+          .feature-list
+            .feature-item
+              i.fas.fa-receipt
+              span Generate receipts with 5% transport fee
+            .feature-item
+              i.fas.fa-credit-card
+              span Multiple payment methods (Cash, Cheque, Bank)
+        .card-actions
+          a.btn-primary(href='/recordingSales')
+            i.fas.fa-plus
+            |  Record Sale
+            
+      // Stock Management
+      .card.stock-card
+        .card-header
+          .card-icon
+            i.fas.fa-warehouse
+          .card-title
+            h3 Stock Management
+            p Manage wood and furniture inventory
+        .card-content
+          .feature-list
+            .feature-item
+              i.fas.fa-tree
+              span Wood products (Timber, Poles, Hard/Soft woods)
+            .feature-item
+              i.fas.fa-couch
+              span Furniture (Beds, Sofas, Tables, Cupboards)
+        .card-actions
+          a.btn-primary(href='/attendantstock')
+            i.fas.fa-plus
+            |  Add Stock
+            
+      // Loading Operations
+      .card.loading-card
+        .card-header
+          .card-icon
+            i.fas.fa-truck-loading
+          .card-title
+            h3 Loading Operations
+            p Manage product loading for delivery
+        .card-content
+          .feature-list
+            .feature-item
+              i.fas.fa-clipboard-list
+              span Create loading forms
+            .feature-item
+              i.fas.fa-truck
+              span Track delivery assignments
+        .card-actions
+          a.btn-primary(href='/loadingform')
+            i.fas.fa-plus
+            |  New Loading Form
+          
+            
+      // Offloading Operations
+      .card.offloading-card
+        .card-header
+          .card-icon
+            i.fas.fa-dolly
+          .card-title
+            h3 Offloading Operations
+            p Manage product receiving and storage
+        .card-content
+          .feature-list
+            .feature-item
+              i.fas.fa-clipboard-check
+              span Create offloading forms
+            .feature-item
+              i.fas.fa-warehouse
+              span Update inventory upon receipt
+        .card-actions
+          a.btn-primary(href='/offloading/new')
+            i.fas.fa-plus
+            |  New Offloading Form
+          a.btn-secondary(href='/offloading/view')
+            i.fas.fa-eye
+            |  View Forms
+            
+      // Reports
+      .card.reports-card
+        .card-header
+          .card-icon
+            i.fas.fa-chart-bar
+          .card-title
+            h3 Reports & Analytics
+            p Generate comprehensive business reports
+        .card-content
+          .feature-list
+            .feature-item
+              i.fas.fa-file-alt
+              span Sales reports for management
+            .feature-item
+              i.fas.fa-chart-line
+              span Stock level reports
+        .card-actions
+          a.btn-primary(href='/reports')
+            i.fas.fa-chart-line
+            |  Sales Report
+          a.btn-secondary(href='/reports')
+            i.fas.fa-boxes
+            |  Stock Report
+            
+      // Quick Actions
+      .card.quick-actions-card
+        .card-header
+          .card-icon
+            i.fas.fa-bolt
+          .card-title
+            h3 Quick Actions
+            p Frequently used operations
+        .card-content
+          .quick-actions-grid
+            a.quick-action(href='/sales/new')
+              i.fas.fa-cash-register
+              span New Sale
+            a.quick-action(href='/stock/low')
+              i.fas.fa-exclamation-triangle
+              span Low Stock
+            a.quick-action(href='/customers')
+              i.fas.fa-users
+              span Customers
+            a.quick-action(href='/suppliersTable')
+              i.fas.fa-truck
+              span Suppliers
+              
+    // Recent Activity
+    .recent-activity
+      .section-header
+        h2
+          i.fas.fa-clock
+          |  Recent Activity
+        button.btn-link(onclick='loadRecentActivity()')
+          i.fas.fa-sync-alt
+          |  Refresh
+      #recentActivity.activity-list
+        // Activity items will be loaded here
+        .activity-item
+          .activity-icon
+            i.fas.fa-shopping-cart
+          .activity-content
+            .activity-title Loading recent activities...
+            .activity-time Just now
+            
+  // Loading Overlay
+  #loadingOverlay.loading-overlay
+    .loading-content
+      .spinner
+      p Loading...
+      
+  script(src='/js/attendant.js')

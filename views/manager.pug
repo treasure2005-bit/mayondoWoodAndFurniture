@@ -1,0 +1,156 @@
+doctype html
+html(lang='en')
+  head
+    meta(charset='UTF-8')
+    meta(name='viewport' content='width=device-width, initial-scale=1.0')
+    title MWF - Manager Dashboard
+    link(rel='stylesheet' href='/css/dashboard.css')
+    script(src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js')
+    link(rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css')
+    
+  body
+    // Navigation
+    .navbar
+      .nav-content
+        h2 MANAGER'S DASHBOARD
+        .nav-links
+          a(href='/registerStock') 
+            i.fas.fa-boxes
+            span MANAGE STOCK
+          a(href='/reports') 
+            i.fas.fa-chart-line
+            span VIEW REPORTS
+          a(href='/login') 
+            i.fas.fa-sign-out-alt
+            span LOGOUT
+
+    .dashboard-container
+      // Header Section
+      .dashboard-header
+        .header-content
+          .header-info
+            h1 MAYONDO WOOD AND FURNITURE 
+            p.subtitle 
+          .header-time
+            .current-date#currentDate
+            .current-time#currentTime
+
+      // Alert Section
+      .alert-section#lowStockAlert(style='display: none;')
+        .alert-card
+          .alert-header
+            i.fas.fa-exclamation-triangle
+            h3 Low Stock Alerts
+          .alert-content#alertContent
+
+      // Key Metrics
+      .metrics-grid
+        .metric-card.sales
+          .metric-icon
+            i.fas.fa-dollar-sign
+          .metric-content
+            .metric-value#totalSales UGX 0
+            .metric-label Total Sales (This Month)
+            .metric-change#salesChange
+              i.fas.fa-arrow-up
+              span +0%
+        
+        .metric-card.stock
+          .metric-icon
+            i.fas.fa-boxes
+          .metric-content
+            .metric-value#totalStock 0
+            .metric-label Total Stock Items
+            .metric-change#stockChange
+              i.fas.fa-arrow-down
+              span -0%
+        
+        .metric-card.value
+          .metric-icon
+            i.fas.fa-chart-line
+          .metric-content
+            .metric-value#stockValue UGX 0
+            .metric-label Stock Value
+            .metric-change#valueChange
+              i.fas.fa-arrow-up
+              span +0%
+        
+        .metric-card.orders
+          .metric-icon
+            i.fas.fa-file-alt
+          .metric-content
+            .metric-value#totalOrders 0
+            .metric-label Orders This Month
+            .metric-change#ordersChange
+              i.fas.fa-arrow-up
+              span +0%
+
+      // Charts and Data Section
+      .charts-grid
+        // Sales Chart
+        .chart-card
+          .chart-header
+            h3 Sales Trend (6 Months)
+            .chart-controls
+              select#salesPeriod
+                option(value='6') Last 6 Months
+                option(value='12') Last 12 Months
+          .chart-container
+            canvas#salesChart
+        
+        // Stock Levels Chart
+        .chart-card
+          .chart-header
+            h3 Current Stock Levels
+            .chart-controls
+              button#refreshStock
+                i.fas.fa-sync-alt
+                span Refresh
+          .chart-container
+            canvas#stockChart
+
+      // Quick Actions & Recent Activity
+      .bottom-section
+        // Quick Actions
+        .quick-actions
+          h3 Quick Actions
+          .action-grid
+            a.action-item(href='/registerStock')
+              .action-icon
+                i.fas.fa-plus-circle
+              .action-content
+                h4 Add New Stock
+                p Register new inventory items
+            
+            a.action-item(href='/salesTable')
+              .action-icon
+                i.fas.fa-shopping-cart
+              .action-content
+                h4 Veiw Sales
+                p Process customer transactions
+            
+            a.action-item(href='/reports')
+              .action-icon
+                i.fas.fa-chart-bar
+              .action-content
+                h4 Generate Report
+                p View detailed analytics
+            a.action-item(href="/stock-report")
+              .action-icon 
+                i.fas.fa-chart-bar 
+              .action-con    
+            
+            a.action-item(href='/suppliersTable')
+              .action-icon
+                i.fas.fa-truck
+              .action-content
+                h4 Manage Suppliers
+                p Update supplier information
+
+        // Recent Transactions
+        .recent-activity
+          h3 Recent Transactions
+          .activity-list#recentTransactions
+            .loading Loading recent transactions...
+
+    script(src='/js/dashboard.js')

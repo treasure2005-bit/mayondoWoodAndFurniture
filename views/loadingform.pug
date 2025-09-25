@@ -1,0 +1,118 @@
+doctype html
+html
+head
+  meta(charset='UTF-8')
+  meta(name='viewport' content='width=device-width, initial-scale=1.0')
+  title MWF - Loading form
+  link(rel='stylesheet' href='/css/loadingform.css')
+  link(href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css' rel='stylesheet')
+  nav.navbar
+    .nav-brand
+    .nav-links
+    .buttons
+      a(href='/attendant')
+        i.fas.fa-home
+        |  Dashboard
+      a.logout(href='/login')
+        i.fas.fa-sign-out-alt
+        |  Logout
+.card.loading-card
+  .card-header
+    .card-title
+      h3 NEW LOADING OPERATION
+      p Record products being loaded for delivery
+  .card-content
+    form#loadingForm( action='/loadingform' method='POST')
+      .form-grid
+        
+        
+        .form-section
+          h4 Loading Details
+          .form-group
+            label(for='loadingDate') Date & Time
+            input#loadingDate(type='datetime-local' name='loadingDate' required)
+          
+          .form-group
+            label(for='vehicleInfo') Vehicle Information
+            input#vehicleInfo(type='text' name='vehicleInfo' placeholder='Vehicle plate/ID' required)
+          
+          .form-group
+            label(for='driverName') Driver Name
+            input#driverName(type='text' name='driverName' placeholder='Driver assigned' required)
+          
+          .form-group
+            label(for='destination') Destination
+            input#destination(type='text' name='destination' placeholder='Delivery location' required)
+
+        
+        .form-section
+          h4 Products to Load
+          .product-selection
+            .form-group
+              label(for='productCategory') Product Category
+              select#productCategory(name='productCategory' required)
+                option(value='') Select category
+                option(value='timber') Wood Products 
+                option(value='furniture') Furniture 
+            
+            .form-group
+              label(for='productName') Product Name
+              select#productName(name="productName") Product Name
+                option(value="") Select product 
+                option(value="Beds") Beds
+                option(value="Timber") Timber
+                option(value="Sofa") Sofa
+                option(value="Poles") Poles
+                option(value="Dining tables") Dining Tables
+                option(value="hard wood") Hard wood
+                option(value="cupboards") Cupboards
+                option(value="soft wood") Soft wood
+                option(value="Drawers") Drawers
+                option(value="Home furniture") Home furniture 
+                option(value="Office furniture") Office furniture
+                
+              
+            
+            .form-row
+              .form-group.half-width
+                label(for='quantity') Quantity
+                input#quantity(type='number' name='quantity' min='1' required)
+              
+              .form-group.half-width
+                label(for='unit') Unit
+                select#unit(name='unit' required)
+                  option(value='') Select unit
+                  option(value='pieces') Pieces
+                  option(value='kg') Kilograms
+                  option(value='tons') Tons
+                  option(value='cubic_meters') Cubic Meters
+                  option(value='sets') Sets
+
+        
+        .form-section
+          h4 Additional Information
+          .form-group
+            label(for='attendantName') Attendant Name
+            input#attendantName(type='text' name='attendantName' placeholder='Your name' required)
+          
+          .form-group
+            label(for='specialInstructions') Special Instructions
+            textarea#specialInstructions(name='specialInstructions' rows='3' placeholder='Any special handling notes...')
+          
+          .form-group
+            label(for='priority') Priority Level
+            select#priority(name='priority')
+              option(value='normal') Normal
+              option(value='urgent') Urgent
+              option(value='low') Low Priority
+
+      
+      .card-actions
+        button.btn-secondary(type='button' onclick='window.history.back()')
+          i.fas.fa-arrow-left
+          | Cancel
+        button.btn-primary(type='submit')
+          i.fas.fa-save
+          | Record Loading
+
+

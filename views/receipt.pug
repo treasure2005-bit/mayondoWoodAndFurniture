@@ -1,0 +1,67 @@
+doctype html
+html
+  head
+    meta(charset="UTF-8")
+    meta(name="viewport" content="width=device-width, initial-scale=1.0")
+    title Receipt
+    link(rel="stylesheet" href="/css/receipt.css")
+  body
+    .receipt(style="max-width: 600px; margin: 20px auto; padding: 20px; border: 2px solid #333;")
+      .receipt-header(style="text-align: center; border-bottom: 2px solid #333; padding-bottom: 15px;")
+        h3 MAYONDO WOOD AND FURNITURE LIMITED
+        p Kampala, Central Region, Uganda
+        p +256-763-177-695 | info@mayondowood.com
+
+      .receipt-details(style="margin: 20px 0;")
+        p
+          strong Receipt #: 
+          | RCP-#{sale._id.toString().slice(-6)}   // last 6 chars of ID
+        p
+          strong Date: 
+          | #{new Date(sale.date).toLocaleDateString()}
+        p
+          strong Time: 
+          | #{new Date(sale.date).toLocaleTimeString()}
+        p
+          strong Customer: 
+          | #{sale.customerName}
+        p
+          strong Payment: 
+          | #{sale.paymentType}
+        p
+          strong Agent: 
+          | #{sale.salesAgent ? sale.salesAgent.fullname : 'No Agent'}
+
+      table.receipt-table(style="width:100%; border-collapse: collapse; margin-top: 15px;")
+        thead
+          tr
+            th Item
+            th Qty
+            th Price
+            th Total
+        tbody
+          tr
+            td #{sale.productName} (#{sale.productType})
+            td #{sale.quantitySold}
+            td UGX #{sale.unitPrice}
+            td UGX #{sale.quantitySold * sale.unitPrice}
+
+      .receipt-footer(style="margin-top: 15px;")
+        - const subtotal = sale.quantitySold * sale.unitPrice;
+        - const transport = Math.round(0.05 * subtotal);
+        - const total = subtotal + transport;
+
+        p 
+          strong SUBTOTAL: UGX 
+          | #{subtotal}
+        p 
+          strong TRANSPORT: UGX 
+          | #{transport}
+        hr
+        p 
+          strong TOTAL AMOUNT: UGX 
+          | #{total}
+
+      div(style="text-align: center; margin-top: 20px;")
+        button(onclick="window.print()" style="background: #4CAF50; color: white; padding: 10px 20px; border: none; border-radius: 5px; margin: 10px;") 🖨️ PRINT
+        a(href="/salesTable" style="background: #f44336; color: white; padding: 10px 20px; border: none; border-radius: 5px; text-decoration: none; margin: 10px;") ❌ CLOSE

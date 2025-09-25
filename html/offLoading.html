@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MWF Attendant Dashboard</title>
+    <link rel="stylesheet" href="/public/css/style.css">
+    <link rel="stylesheet" href="/public/attendant.css">
+</head>
+<body>
+   <div class="navbar">
+    <a href="attendantstock.html">RECORD STOCK</a>
+    <a href="recordingSales.html">RECORD SALES</a>
+    <a href="productsTable.html">PRODUCTS TABLE</a>
+    <a href="loading.html">LOADING ITEMS</a>
+    <a href="offLoading.html">OFFLOADING ITEMS</a>
+    <a href="attendant.html">BACK</a>
+    <a href="login.html">LOGOUT</a>
+  </div> 
+  <div id="offloading" class="tab-content">
+            <h3>Offloading Items</h3>
+            <form id="offloadingForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="offloadProductName">Product Name:</label>
+                        <input type="text" id="offloadProductName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="offloadQuantity">Quantity Offloading:</label>
+                        <input type="number" id="offloadQuantity" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="offloadSource">Source:</label>
+                        <input type="text" id="offloadSource" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="offloadDate">Offloading Date:</label>
+                        <input type="date" id="offloadDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="offloadVehicle">Vehicle/Transport:</label>
+                        <input type="text" id="offloadVehicle" required>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">Record Offloading</button>
+            </form>
+
+            <!-- Offloading Table -->
+            <table id="offloadingTable">
+                <thead>
+                    <tr>
+                        <th>Product Name</th>
+                        <th>Quantity</th>
+                        <th>Source</th>
+                        <th>Date</th>
+                        <th>Vehicle</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="offloadingTableBody">
+                </tbody>
+            </table>
+        </div>
+</body>
+</html>

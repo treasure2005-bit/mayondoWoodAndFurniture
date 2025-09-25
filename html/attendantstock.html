@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="/public/css/style.css">
+    <link rel="stylesheet" href="/public/attendant.css">
+<body>
+    <div class="navbar">
+    <h2>ATTENDANT'S DASHBOARD</h2>
+    <a href="attendantstock.html">RECORD STOCK</a>
+    <a href="record-sale.html">RECORD SALES</a>
+    <a href="productsTable.html">PRODUCTS TABLE</a>
+    <a href="loading.html">LOADING ITEMS</a>
+    <a href="offLoading.html">OFFLOADING ITEMS</a>
+    <a href="attendant.html">BACK</a>
+    <a href="login.html">LOGOUT</a>
+  </div>
+</head>
+<body>
+    <div id="stock" class="tab-content active">
+            <h3>Record Stock</h3>
+            <form id="stockForm" action="/attendantstock" method="post">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="stockProductName">Product Name:</label>
+                        <input type="text" id="stockProductName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="stockProductType">Product Type:</label>
+                        <select id="stockProductType" required>
+                            <option value="">Select Type</option>
+                            <option value="timber">Timber</option>
+                            <option value="poles">Poles</option>
+                            <option value="hardwood">Hard Wood</option>
+                            <option value="softwood">Soft Wood</option>
+                            
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="stockCostPrice">Cost Price:</label>
+                        <input type="number" id="stockCostPrice" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="stockQuantity">Quantity:</label>
+                        <input type="number" id="stockQuantity" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="stockPrice">Product Price:</label>
+                        <input type="number" id="stockPrice" step="0.01" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="stockSupplier">Supplier Name:</label>
+                        <input type="text" id="stockSupplier" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="stockDate">Date:</label>
+                        <input type="date" id="stockDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="stockQuality">Quality:</label>
+                        <select id="stockQuality" required>
+                            <option value="">Select Quality</option>
+                            <option value="premium">Premium</option>
+                            <option value="standard">Standard</option>
+                            <option value="economy">Economy</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="stockColor">Color (Optional):</label>
+                        <input type="text" id="stockColor">
+                    </div>
+                    <div class="form-group">
+                        <label for="stockMeasurements">Measurements (Optional):</label>
+                        <input type="text" id="stockMeasurements" placeholder="e.g., 2m x 4m x 1cm">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">Record Stock</button>
+                <button type="button" class="btn btn-success" onclick="generateStockReport()">Generate Stock Report</button>
+            </form>
+<table id="stockTable">
+                <thead>
+                    <tr>
+                        <th>Product Name</th>
+                        <th>Type</th>
+                        <th>Quantity</th>
+                        <th>Cost Price</th>
+                        <th>Selling Price</th>
+                        <th>Supplier</th>
+                        <th>Date</th>
+                        <th>Quality</th>
+                    </tr>
+                </thead>
+                <tbody id="stockTableBody">
+                </tbody>
+            </table>
+<div id="stockReportSection" class="report-section" style="display: none;">
+                <h4>Stock Report Generated</h4>
+                <p>Stock report has been generated and saved for manager review.</p>
+                <p>Report ID: <span id="stockReportId"></span></p>
+                <p>Generated on: <span id="stockReportDate"></span></p>
+            </div>
+        </div>
+</body>
+</html>

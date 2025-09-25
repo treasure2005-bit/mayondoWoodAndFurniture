@@ -1,0 +1,73 @@
+doctype html
+html
+  head
+    meta(charset='UTF-8')
+    meta(name='viewport' content='width=device-width, initial-scale=1.0')
+    title MWF - MANAGER STOCK REGISTRATION
+    link(rel='stylesheet' href='/css/style.css')
+    link(rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css')
+  bodybody
+    .navbar
+      a(href='/dashboard')
+        i.fas.fa-home
+        |  Dashboard
+      a(href='/login')
+        i.fas.fa-sign-out-alt
+        span LOGOUT
+    .container 
+      h2(style='margin-right:700px') MANAGER STOCK REGISTRATION
+      form(action="/registerStock",method="post")
+        fieldset
+          legend Manager Information
+          label(for='managerName') Manager Name:
+          input#managerName(type='text' placeholder='Enter manager name' required name='managerName')
+          label(for='managerId') Manager ID:
+          input#managerId(type='text' placeholder='Enter manager ID' required name='managerId')
+          label(for='date') Date of Registration:
+          input#date(type='date' required name='date')
+        fieldset
+          legend Product Information
+          label(for='productName') Product Name:
+          select#productName(name='productName' required)
+            option(value='') Select Product Name
+            option(value='beds') Beds
+            option(value='sofa') Sofa
+            option(value='dining tables') Dining Tables
+            option(value='cupboards') Cupboards
+            option(value='drawers') Drawers
+            option(value='timber') Timber 
+            option(value='poles') Poles 
+            option(value='hardwood') Hardwood
+            option(value='softwood') Softwood
+          label(for='productType') Product Type:
+          select#productType(name='productType' required)
+            option(value='') Select Product Type
+            option(value='home furniture') Home Furniture
+            option(value='office furniture') Office Furniture
+            option(value='wood') Wood
+          label(for='costPrice') Cost Price:
+          input#costPrice(type='number' step="1000" placeholder='Enter cost price' required name='costPrice')
+          label(for='productPrice') Product Price:
+          input#productPrice(type='number' step="1000" placeholder='Enter product price' required name='productPrice')
+          label(for='quantity') Quantity:
+          input#quantity(type='number' placeholder='Enter quantity' required name='quantity')
+          label(for='supplier') Supplier Name:
+          input#supplier(type='text' placeholder='Enter supplier name' required name='supplierName')
+          label(for='quality') Quality:
+          select#quality(name='quality' required)
+            option(value='') Select Quality 
+            option(value='good') Good
+            option(value='medium') Medium
+            option(value='bad') Bad
+          label(for='color') Color:
+          input#color(type='color' required name='color')
+          label(for='measurement') Measurement (e.g., size in cm):
+          input#measurement(type='text' placeholder='Enter measurement details' required name='measurement')
+        fieldset
+          legend Approval Status
+          label(for='status') Status:
+          select#status(name='status' required)
+            option(value='pending') Pending Approval
+            option(value='approved') Approved for Sale
+            option(value='rejected') Rejected
+        button(type='submit') Register Stock
