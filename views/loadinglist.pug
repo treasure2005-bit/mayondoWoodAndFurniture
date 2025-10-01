@@ -1,0 +1,33 @@
+doctype html
+html
+  head
+    title All Loadings
+    link(rel='stylesheet' href='/css/loadinglist.css')
+  body
+    .container
+      h2 All Loading Operations
+      table
+        thead
+          tr
+            th Date
+            th Vehicle
+            th Driver
+            th Destination
+            th Product
+            th Qty
+            th Unit
+            th Actions
+        tbody
+          each loading in loadings
+            tr
+              td= loading.loadingDate
+              td= loading.vehicleInfo
+              td= loading.driverName
+              td= loading.destination
+              td= loading.productName
+              td= loading.quantity
+              td= loading.unit
+              td
+                a(href=`/loadingform/${loading._id}/edit`) Edit
+                form(action=`/loadingform/${loading._id}/delete` method='POST' style='display:inline;')
+                  button(type='submit' onclick='return confirm("Delete this record?")') Delete

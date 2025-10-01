@@ -1,0 +1,55 @@
+doctype html
+html(lang='en')
+  head
+    meta(charset='UTF-8')
+    meta(name='viewport' content='width=device-width, initial-scale=1.0')
+    title MWF - Manage Attendants
+    link(rel='stylesheet' href='/css/style.css')
+    link(rel='stylesheet' href='/css/manageAttendants.css')
+    
+  body
+    a.back-btn(href='/dashboard')
+      | ← Back to Dashboard
+    
+    .management-container
+      // Success/Error Messages
+      if success
+        .alert.alert-success #{success}
+      
+      if error
+        .alert.alert-error #{error}
+      
+      // Add New Attendant Form
+      .login-box
+        h2 ADD NEW ATTENDANT
+        form(action='/dashboard/create-attendant' method='post')
+          .form-grid
+            input(type='text' name='fullName' placeholder='Full Name' required)
+            input(type='email' name='email' placeholder='Email Address' required)
+            .full-width
+              input(type='password' name='password' placeholder='Password (min 6 characters)' required minlength='6')
+          button(type='submit') Create Attendant
+      
+      // Current Attendants List
+      .attendants-section
+        h2 CURRENT ATTENDANTS (#{attendants ? attendants.length : 0})
+        
+        if attendants && attendants.length > 0
+          table.attendants-table
+            thead
+              tr
+                th FULL NAME
+                th EMAIL
+                th DATE CREATED
+                th ACTIONS
+            tbody
+              each attendant in attendants
+                tr
+                  td #{attendant.fullName || 'N/A'}
+                  td #{attendant.email}
+                  td #{attendant.createdAt ? attendant.createdAt.toLocaleDateString() : 'N/A'}
+                  td
+                    form(action=`/dashboard/delete-attendant/${attendant._id}` method='post' style='display: inline;' onsubmit='return confirm("Are you sure you want to delete this attendant?");')
+                      button.btn-danger(type='submit') Delete
+        else
+          .no-attendants No attendants found. Create your first attendant above.

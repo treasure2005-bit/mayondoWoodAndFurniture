@@ -1,36 +1,100 @@
 const express = require("express");
 const router = express.Router();
-const {ensureauthenticated,ensureAgent} = require("../middleware/auth")
-
 const salesModel = require("../models/salesModel");
 
-// GET: Display edit form for specific sale
-router.get("/editSales/:id", async (req, res) => {
+// Middleware to check authentication - FIXED VERSION
+const isAuthenticated = (req, res, next) => {
+  if (req.isAuthenticated()) {
+    return next();
+  }
+  res.redirect("/login");
+};
+
+// Sales Table - Shows edit/delete only for Managers
+router.get("/salesTable", isAuthenticated, async (req, res) => {
   try {
-    const sale = await salesModel.findById(req.params.id);
-    if (!sale) {
-      return res.status(404).send("sale not found");
-    }
-    res.render("editSales", { sale });
+    const sales = await salesModel
+      .find()
+      .populate("salesAgent", "username email")
+      .sort({ _id: -1 });
+
+    res.render("salesTable", {
+      title: "Sales Records",
+      sales: sales,
+      user: req.user,
+      userRole: req.user.role, // Pass role to template
+    });
   } catch (error) {
-    console.error("Error fetching sale for edit:", error);
-    res.status(500).send("Error loading edit form");
+    console.error("Error fetching sales:", error);
+    res.status(500).send("Error loading sales");
   }
 });
 
-// POST: Handle sale updates
-router.post("/editSales/:id", async (req, res) => {
+// Recording Sales Page
+router.get("/recordingSales", isAuthenticated, async (req, res) => {
   try {
-    const updatedSales = await salesModel.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true, runValidators: true }
-    );
+    res.render("recordingSales", {
+      title: "Record Sale",
+      user: req.user,
+    });
+  } catch (error) {
+    console.error("Error loading recording sales page:", error);
+    res.status(500).send("Error loading page");
+  }
+});
 
-    if (!updatedSales) {
-      return res.status(404).send("sale not found");
-    }
+// Create new sale
+router.post("/recordingSales", isAuthenticated, async (req, res) => {
+  try {
+    const newSale = new salesModel({
+      customerName: req.body.customerName,
+      productType: req.body.productType,
+      productName: req.body.productName,
+      quantitySold: req.body.quantitySold,
+      unitPrice: req.body.unitPrice,
+      date: req.body.date,
+      paymentType: req.body.paymentType,
+      salesAgent: req.user._id,
+      checkBox: req.body.checkBox || "",
+    });
 
+    await newSale.save();
+    res.redirect("/salesTable");
+  } catch (error) {
+    console.error("Error recording sale:", error);
+    res.status(500).send("Error recording sale");
+  }
+});
+
+// Edit sale - Only for Managers
+router.get("/sales/edit/:id", isAuthenticated, async (req, res) => {
+  // Check if user is Manager
+  if (req.user.role !== "Manager") {
+    return res.status(403).send("Access denied. Managers only.");
+  }
+
+  try {
+    const sale = await salesModel.findById(req.params.id);
+    res.render("editSale", {
+      title: "Edit Sale",
+      sale: sale,
+      user: req.user,
+    });
+  } catch (error) {
+    console.error("Error loading sale:", error);
+    res.status(500).send("Error loading sale");
+  }
+});
+
+// Update sale - Only for Managers
+router.post("/sales/edit/:id", isAuthenticated, async (req, res) => {
+  // Check if user is Manager
+  if (req.user.role !== "Manager") {
+    return res.status(403).send("Access denied. Managers only.");
+  }
+
+  try {
+    await salesModel.findByIdAndUpdate(req.params.id, req.body);
     res.redirect("/salesTable");
   } catch (error) {
     console.error("Error updating sale:", error);
@@ -38,13 +102,15 @@ router.post("/editSales/:id", async (req, res) => {
   }
 });
 
-// POST: Handle sale deletion
-router.post("/deleteSales/:id", async (req, res) => {
+// Delete sale - Only for Managers
+router.post("/sales/delete/:id", isAuthenticated, async (req, res) => {
+  // Check if user is Manager
+  if (req.user.role !== "Manager") {
+    return res.status(403).send("Access denied. Managers only.");
+  }
+
   try {
-    const deletedSales = await salesModel.findByIdAndDelete(req.params.id);
-    if (!deletedSales) {
-      return res.status(404).send("sale not found");
-    }
+    await salesModel.findByIdAndDelete(req.params.id);
     res.redirect("/salesTable");
   } catch (error) {
     console.error("Error deleting sale:", error);
@@ -52,87 +118,27 @@ router.post("/deleteSales/:id", async (req, res) => {
   }
 });
 
-router.get("/recordingSales", (req, res) => {
-    res.render("recordingSales");
-});
+// View Receipt
+router.get("/getReceipt/:id", isAuthenticated, async (req, res) => {
+  try {
+    const sale = await salesModel
+      .findById(req.params.id)
+      .populate("salesAgent", "username email");
 
-
-router.post("/recordingSales",ensureauthenticated,ensureAgent, async (req, res) => {
-    try{
-        const {
-            customerName,
-            productType,
-            productName,
-            quantitySold,
-            unitPrice,
-            date,
-            paymentType,
-             checkBox,
-        } = req.body;
-        const userId = req.session.user._id;
-
-        const sale = new salesModel({
-          customerName,
-          productType,
-          productName,
-          quantitySold,
-          unitPrice,
-          date,
-          paymentType,
-          salesAgent: userId,
-          checkBox,
-        });
-        console.log(userId);
-        await sale.save();
-        res.redirect("/salesTable")
-    }  catch (error) {
-        console.error(error);
-        res.redirect("/recordingSales");
+    if (!sale) {
+      return res.status(404).send("Receipt not found");
     }
-});
 
-
-// router.get("/salesTable", (req, res) => {
-//     res.render("salesTable");
-// });
-
-router.get("/salesTable", async (req, res) => {
-  try {
-    const sales = await salesModel.find()
-    .populate("salesAgent", "email");
-
-    console.log(
-      "Sales data:",
-      sales.map((sale) => ({
-        id: sale._id,
-        salesAgent: sale.salesAgent,
-        customerName: sale.customerName,
-      }))
-    );
-
-
-    const currentUser = req.session.user;
-
-
-    console.log(currentUser);
-    res.render("salesTable", { sales, currentUser });
+    res.render("receipt", {
+      title: "Receipt",
+      sale: sale,       // 👈 pass sale to Pug
+      user: req.user,
+    });
   } catch (error) {
-    console.log(error.message);
-    res.redirect("/salesTable")
+    console.error("Error loading receipt:", error);
+    res.status(500).send("Error loading receipt");
   }
 });
-
-router.get("/getReceipt/:id", async (req, res) => {
-  try {
-    const sale = await salesModel.findOne({_id:req.params.id}).populate("salesAgent", "fullname");
-    res.render("receipt", { sale });
-  } catch (error) {
-    console.error(error.message);
-    res.status(400).send("Unble to find sale");
-  }
-});
-
-
 
 
 module.exports = router;

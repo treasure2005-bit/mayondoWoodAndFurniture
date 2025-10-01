@@ -53,9 +53,7 @@ class MWFDashboard {
 
   async loadDashboardData() {
     try {
-      // In a real application, these would be API calls to your Node.js backend
-      // For now, using sample data
-
+      // Fetch real data from your backend API
       const data = await this.fetchDashboardData();
       this.updateMetrics(data.metrics);
       this.updateLowStockAlerts(data.lowStock);
@@ -68,87 +66,50 @@ class MWFDashboard {
   }
 
   async fetchDashboardData() {
-    // Simulate API call - replace with actual fetch to your Node.js endpoints
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve({
-          metrics: {
-            totalSales: 58000000,
-            totalStock: 187,
-            stockValue: 275000000,
-            totalOrders: 159,
-            changes: {
-              sales: 12.5,
-              stock: -2.3,
-              value: 8.7,
-              orders: 15.2,
-            },
+    try {
+      // Make real API call to your backend
+      const response = await fetch("/dashboard/api/data");
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error("Error fetching dashboard data:", error);
+      // Return fallback data if API fails
+      return {
+        metrics: {
+          totalSales: 0,
+          totalStock: 0,
+          stockValue: 0,
+          totalOrders: 0,
+          changes: {
+            sales: 0,
+            stock: 0,
+            value: 0,
+            orders: 0,
           },
-          lowStock: [
-            { name: "Timber", quantity: 8, minStock: 15 },
-            { name: "Poles", quantity: 3, minStock: 10 },
-          ],
-          charts: {
-            sales: [
-              { month: "Apr", sales: 61000000 },
-              { month: "May", sales: 55000000 },
-              { month: "Jun", sales: 58000000 },
-              { month: "Jul", sales: 52000000 },
-              { month: "Aug", sales: 64000000 },
-              { month: "Sep", sales: 58000000 },
-            ],
-            stock: [
-              { name: "Beds", quantity: 45, minStock: 20 },
-              { name: "Timber", quantity: 8, minStock: 15 },
-              { name: "Sofa", quantity: 67, minStock: 25 },
-              { name: "Poles", quantity: 3, minStock: 10 },
-              { name: "Dining Tables", quantity: 12, minStock: 8 },
-              { name: "Hard wood", quantity: 6, minStock: 5 },
-              { name: "Cupboards", quantity: 6, minStock: 5 },
-              { name: "Soft wood", quantity: 6, minStock: 5 },
-              { name: "Drawers", quantity: 6, minStock: 5 },
-              { name: "Home furniture", quantity: 6, minStock: 5 },
-              { name: "Office furniture", quantity: 6, minStock: 5 },
-            ],
-          },
-          transactions: [
-            {
-              customer: "Kampala Construction Ltd",
-              product: "Mahogany Timber",
-              amount: 8500000,
-              date: "2024-09-17",
-              agent: "John Mukisa",
-            },
-            {
-              customer: "Modern Homes Uganda",
-              product: "Office Desk Set",
-              amount: 3750000,
-              date: "2024-09-16",
-              agent: "Sarah Nambi",
-            },
-            {
-              customer: "Elite Furniture Co.",
-              product: "Sofa Set",
-              amount: 2500000,
-              date: "2024-09-16",
-              agent: "David Kato",
-            },
-          ],
-        });
-      }, 1000);
-    });
+        },
+        lowStock: [],
+        charts: {
+          sales: [],
+          stock: [],
+        },
+        transactions: [],
+      };
+    }
   }
 
   updateMetrics(metrics) {
     // Update metric values
     this.updateElement(
       "totalSales",
-      `UGX ${(metrics.totalSales / 1000000).toFixed(1)}M`
+      `UGX ${this.formatCurrency(metrics.totalSales)}`
     );
     this.updateElement("totalStock", metrics.totalStock.toLocaleString());
     this.updateElement(
       "stockValue",
-      `UGX ${(metrics.stockValue / 1000000).toFixed(1)}M`
+      `UGX ${this.formatCurrency(metrics.stockValue)}`
     );
     this.updateElement("totalOrders", metrics.totalOrders.toLocaleString());
 
@@ -157,6 +118,16 @@ class MWFDashboard {
     this.updateChange("stockChange", metrics.changes.stock);
     this.updateChange("valueChange", metrics.changes.value);
     this.updateChange("ordersChange", metrics.changes.orders);
+  }
+
+  formatCurrency(amount) {
+    if (amount >= 1000000) {
+      return (amount / 1000000).toFixed(1) + "M";
+    } else if (amount >= 1000) {
+      return (amount / 1000).toFixed(1) + "K";
+    } else {
+      return amount.toLocaleString();
+    }
   }
 
   updateChange(elementId, change) {
@@ -184,7 +155,7 @@ class MWFDashboard {
     const alertSection = document.getElementById("lowStockAlert");
     const alertContent = document.getElementById("alertContent");
 
-    if (lowStock.length > 0) {
+    if (lowStock && lowStock.length > 0) {
       alertSection.style.display = "block";
       alertContent.innerHTML = lowStock
         .map(
@@ -212,6 +183,12 @@ class MWFDashboard {
 
     if (this.salesChart) {
       this.salesChart.destroy();
+    }
+
+    // Handle empty data
+    if (!salesData || salesData.length === 0) {
+      ctx.getContext("2d").clearRect(0, 0, ctx.width, ctx.height);
+      return;
     }
 
     this.salesChart = new Chart(ctx, {
@@ -242,8 +219,8 @@ class MWFDashboard {
           y: {
             beginAtZero: true,
             ticks: {
-              callback: function (value) {
-                return "UGX " + value / 1000000 + "M";
+              callback: (value) => {
+                return "UGX " + this.formatCurrency(value);
               },
             },
           },
@@ -258,6 +235,12 @@ class MWFDashboard {
 
     if (this.stockChart) {
       this.stockChart.destroy();
+    }
+
+    // Handle empty data
+    if (!stockData || stockData.length === 0) {
+      ctx.getContext("2d").clearRect(0, 0, ctx.width, ctx.height);
+      return;
     }
 
     this.stockChart = new Chart(ctx, {
@@ -307,6 +290,12 @@ class MWFDashboard {
     const container = document.getElementById("recentTransactions");
     if (!container) return;
 
+    if (!transactions || transactions.length === 0) {
+      container.innerHTML =
+        '<div class="loading">No recent transactions found.</div>';
+      return;
+    }
+
     container.innerHTML = transactions
       .map(
         (transaction) => `
@@ -318,7 +307,7 @@ class MWFDashboard {
         }</p>
                 </div>
                 <div class="activity-amount">
-                    UGX ${(transaction.amount / 1000000).toFixed(1)}M
+                    UGX ${this.formatCurrency(transaction.amount)}
                 </div>
             </div>
         `
@@ -326,7 +315,7 @@ class MWFDashboard {
       .join("");
   }
 
-  refreshStockData() {
+  async refreshStockData() {
     const refreshBtn = document.getElementById("refreshStock");
     const icon = refreshBtn?.querySelector("i");
 
@@ -334,20 +323,40 @@ class MWFDashboard {
       icon.style.animation = "spin 1s linear infinite";
     }
 
-    // Simulate data refresh
-    setTimeout(() => {
-      this.loadDashboardData();
+    try {
+      // Fetch fresh stock data from API
+      const response = await fetch("/dashboard/api/stock/refresh");
+      if (response.ok) {
+        const result = await response.json();
+        if (result.success) {
+          // Update stock chart with fresh data
+          this.initStockChart(result.data);
+        }
+      }
+    } catch (error) {
+      console.error("Error refreshing stock data:", error);
+      this.showError("Failed to refresh stock data");
+    } finally {
       if (icon) {
         icon.style.animation = "";
       }
-    }, 1000);
+    }
   }
 
-  updateSalesChart(period) {
-    // In a real app, fetch new data based on period
-    console.log(`Updating sales chart for ${period} months`);
-    // For now, just refresh with existing data
-    this.loadDashboardData();
+  async updateSalesChart(period) {
+    try {
+      // Fetch sales data for the selected period
+      const response = await fetch(`/dashboard/api/sales/${period}`);
+      if (response.ok) {
+        const result = await response.json();
+        if (result.success) {
+          this.initSalesChart(result.data);
+        }
+      }
+    } catch (error) {
+      console.error("Error updating sales chart:", error);
+      this.showError("Failed to update sales chart");
+    }
   }
 
   updateElement(id, value) {
@@ -377,7 +386,9 @@ class MWFDashboard {
 
     // Remove after 5 seconds
     setTimeout(() => {
-      document.body.removeChild(errorDiv);
+      if (document.body.contains(errorDiv)) {
+        document.body.removeChild(errorDiv);
+      }
     }, 5000);
   }
 }

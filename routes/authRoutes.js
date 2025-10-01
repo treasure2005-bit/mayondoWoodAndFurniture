@@ -1,25 +1,19 @@
 const express = require("express");
 const router = express.Router();
 const passport = require("passport");
-
-
 const userModel = require("../models/userModel");
-const stockModel = require("../models/stockModel");
 
 // Getting the register form
 router.get("/signup", (req, res) => {
   res.render("signup", { title: "signup" });
 });
 
-
-//todo GETTING LANDING PAGE
-router.get("/", (req,res) => {
-  res.render("index")
+// GETTING LANDING PAGE
+router.get("/", (req, res) => {
+  res.render("index");
 });
 
-
-
-
+// SIGNUP POST
 router.post("/signup", async (req, res) => {
   try {
     const user = new userModel(req.body);
@@ -35,31 +29,44 @@ router.post("/signup", async (req, res) => {
         res.redirect("/login");
       });
     }
-    // user.save();
   } catch (error) {
     res.status(400).send("Something went wrong!");
   }
 });
 
-
-
+// LOGIN GET
 router.get("/login", (req, res) => {
   res.render("login");
 });
 
-router.post("/login",passport.authenticate("local", { failureRedirect: "/login" }),
+// LOGIN POST - WITH DEBUG LOGGING
+router.post(
+  "/login",
+  passport.authenticate("local", { failureRedirect: "/login" }),
   (req, res) => {
+    // ADD THESE DEBUG LOGS
+    console.log("=== LOGIN SUCCESS ===");
+    console.log("User:", req.user);
+    console.log("User Role:", req.user.role);
+    console.log("Session:", req.session);
+    console.log("===================");
+
     req.session.user = req.user;
+
     if (req.user.role === "Manager") {
+      console.log("Redirecting Manager to /dashboard");
       res.redirect("/dashboard");
     } else if (req.user.role === "Attendant") {
-      res.redirect("/recordingSales");
-    } else res.render("noneuser");
+      console.log("Redirecting Attendant to /attendant");
+      res.redirect("/attendant");
+    } else {
+      console.log("Unknown role, showing noneuser page");
+      res.render("noneuser");
+    }
   }
 );
 
-//  todo   Handle insertion of duplicate data using a try and catch(check if the individual exists, redirect to the login)
-
+// LOGOUT
 router.get("/logout", (req, res) => {
   if (req.session) {
     req.session.destroy((error) => {
@@ -70,22 +77,5 @@ router.get("/logout", (req, res) => {
     });
   }
 });
-
-
-router.get("/dashboard", async (req, res) => {
-res.render("manager");
-});
-
-//todo handle insertion of duplicate data using a try and catch (check if the individual exists, redirect to the login)
-
-
-
-
-
-//todo LOADING AND OFFLOADING
-router.get("/loadingform", (req, res) => {
-  res.render("loadingform");
-});
-
 
 module.exports = router;

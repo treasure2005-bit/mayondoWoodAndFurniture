@@ -1,80 +1,167 @@
-// dashboard.route.js - Add this to your routes folder
+// dashboard.route.js - Updated with real database integration
 const express = require("express");
 const router = express.Router();
 
-// Sample data - replace with actual database queries
+// Add this import for user management
+const userModel = require("../models/userModel");
+
+// Import your models
+const stockModel = require("../models/stockModel");
+const salesModel = require("../models/salesModel");
+
+// Real data from database
 const getDashboardData = async () => {
   try {
-    // In a real application, you would fetch this data from your database
-    // Example queries you might use:
+    const currentDate = new Date();
+    const currentMonth = currentDate.getMonth() + 1;
+    const currentYear = currentDate.getFullYear();
+    const lastMonth = currentMonth === 1 ? 12 : currentMonth - 1;
+    const lastMonthYear = currentMonth === 1 ? currentYear - 1 : currentYear;
 
-    // const totalSales = await db.query('SELECT SUM(amount) FROM sales WHERE MONTH(date) = MONTH(CURDATE())');
-    // const totalStock = await db.query('SELECT SUM(quantity) FROM stock');
-    // const lowStock = await db.query('SELECT * FROM stock WHERE quantity <= min_stock_level');
+    // 1. Get total stock items and stock value
+    const allStock = await stockModel.find({ status: "approved" }); // Only count approved stock
+    const totalStock = allStock.reduce(
+      (sum, item) => sum + (item.quantity || 0),
+      0
+    );
+    const stockValue = allStock.reduce(
+      (sum, item) => sum + (item.quantity || 0) * (item.productPrice || 0),
+      0
+    );
+
+    // 2. Get low stock items (using 10 as default minimum since no minStockLevel field)
+    const lowStockItems = allStock.filter((item) => {
+      const minLevel = 10; // Default minimum stock level
+      return (item.quantity || 0) <= minLevel;
+    });
+
+    // 3. Get current month sales
+    let totalSales = 0;
+    let totalOrders = 0;
+    let lastMonthSales = 0;
+
+    try {
+      // Get sales for current month (date is stored as string, so we need to parse it)
+      const allSales = await salesModel
+        .find({})
+        .populate("salesAgent", "fullName");
+
+      const currentMonthSales = allSales.filter((sale) => {
+        const saleDate = new Date(sale.date);
+        return (
+          saleDate.getMonth() + 1 === currentMonth &&
+          saleDate.getFullYear() === currentYear
+        );
+      });
+
+      const lastMonthSalesData = allSales.filter((sale) => {
+        const saleDate = new Date(sale.date);
+        return (
+          saleDate.getMonth() + 1 === lastMonth &&
+          saleDate.getFullYear() === lastMonthYear
+        );
+      });
+
+      totalSales = currentMonthSales.reduce((sum, sale) => {
+        const saleAmount = (sale.quantitySold || 0) * (sale.unitPrice || 0);
+        return sum + saleAmount;
+      }, 0);
+
+      totalOrders = currentMonthSales.length;
+
+      lastMonthSales = lastMonthSalesData.reduce((sum, sale) => {
+        const saleAmount = (sale.quantitySold || 0) * (sale.unitPrice || 0);
+        return sum + saleAmount;
+      }, 0);
+    } catch (salesError) {
+      console.log("Sales data error:", salesError.message);
+    }
+
+    // 4. Calculate percentage changes
+    const salesChange =
+      lastMonthSales > 0
+        ? ((totalSales - lastMonthSales) / lastMonthSales) * 100
+        : 0;
+
+    // 5. Get recent sales data for charts (last 6 months)
+    const salesChartData = [];
+    const allSales = await salesModel.find({});
+
+    for (let i = 5; i >= 0; i--) {
+      const targetMonth = currentMonth - i;
+      const targetYear = targetMonth <= 0 ? currentYear - 1 : currentYear;
+      const adjustedMonth = targetMonth <= 0 ? targetMonth + 12 : targetMonth;
+
+      const monthSales = allSales.filter((sale) => {
+        const saleDate = new Date(sale.date);
+        return (
+          saleDate.getMonth() + 1 === adjustedMonth &&
+          saleDate.getFullYear() === targetYear
+        );
+      });
+
+      const monthTotal = monthSales.reduce((sum, sale) => {
+        const saleAmount = (sale.quantitySold || 0) * (sale.unitPrice || 0);
+        return sum + saleAmount;
+      }, 0);
+
+      const monthDate = new Date(targetYear, adjustedMonth - 1, 1);
+      salesChartData.push({
+        month: monthDate.toLocaleDateString("en-US", { month: "short" }),
+        sales: monthTotal,
+      });
+    }
+
+    // 6. Get recent transactions (last 10)
+    let recentTransactions = [];
+    try {
+      const recentSales = await salesModel
+        .find({})
+        .sort({ _id: -1 }) // Sort by most recent (using _id since date is string)
+        .limit(10)
+        .populate("salesAgent", "fullName")
+        .exec();
+
+      recentTransactions = recentSales.map((sale) => ({
+        customer: sale.customerName || "Unknown Customer",
+        product: sale.productName || "Product",
+        amount: (sale.quantitySold || 0) * (sale.unitPrice || 0),
+        date: sale.date || new Date().toISOString().split("T")[0],
+        agent: sale.salesAgent ? sale.salesAgent.fullName : "Unknown Agent",
+      }));
+    } catch (error) {
+      console.log("Recent transactions error:", error.message);
+    }
 
     return {
       metrics: {
-        totalSales: 58000000,
-        totalStock: 187,
-        stockValue: 275000000,
-        totalOrders: 159,
+        totalSales: totalSales,
+        totalStock: totalStock,
+        stockValue: stockValue,
+        totalOrders: totalOrders,
         changes: {
-          sales: 12.5,
-          stock: -2.3,
-          value: 8.7,
-          orders: 15.2,
+          sales: Math.round(salesChange * 100) / 100,
+          stock: 0, // Calculate based on your needs
+          value: 0, // Calculate based on your needs
+          orders: 0, // Calculate based on your needs
         },
       },
-      lowStock: [
-        { name: "Timber", quantity: 8, minStock: 15 },
-        { name: "Poles", quantity: 3, minStock: 10 },
-      ],
+      lowStock: lowStockItems.map((item) => ({
+        name: item.productName,
+        quantity: item.quantity || 0,
+        minStock: 10, // Default minimum
+      })),
       charts: {
-        sales: [
-          { month: "Apr", sales: 61000000 },
-          { month: "May", sales: 55000000 },
-          { month: "Jun", sales: 58000000 },
-          { month: "Jul", sales: 52000000 },
-          { month: "Aug", sales: 64000000 },
-          { month: "Sep", sales: 58000000 },
-        ],
-        stock: [
-          { name: "Beds", quantity: 45, minStock: 20 },
-          { name: "Timber", quantity: 8, minStock: 15 },
-          { name: "Sofa", quantity: 67, minStock: 25 },
-          { name: "Poles", quantity: 3, minStock: 10 },
-          { name: "Dining Tables", quantity: 12, minStock: 8 },
-          { name: "Hard wood", quantity: 6, minStock: 5 },
-          { name: "Cupboards", quantity: 6, minStock: 5 },
-          { name: "Soft wood", quantity: 6, minStock: 5 },
-          { name: "Drawers", quantity: 6, minStock: 5 },
-          { name: "Home furniture", quantity: 6, minStock: 5 },
-          { name: "Office furniture", quantity: 6, minStock: 5 },
-        ],
+        sales: salesChartData,
+        stock: allStock
+          .map((item) => ({
+            name: item.productName,
+            quantity: item.quantity || 0,
+            minStock: 10, // Default minimum
+          }))
+          .slice(0, 10), // Limit to top 10 for chart
       },
-      transactions: [
-        {
-          customer: "Kampala Construction Ltd",
-          product: "Mahogany Timber",
-          amount: 8500000,
-          date: "2024-09-17",
-          agent: "John Mukisa",
-        },
-        {
-          customer: "Modern Homes Uganda",
-          product: "Office Desk Set",
-          amount: 3750000,
-          date: "2024-09-16",
-          agent: "Sarah Nambi",
-        },
-        {
-          customer: "Elite Furniture Co.",
-          product: "Sofa Set",
-          amount: 2500000,
-          date: "2024-09-16",
-          agent: "David Kato",
-        },
-      ],
+      transactions: recentTransactions,
     };
   } catch (error) {
     console.error("Error fetching dashboard data:", error);
@@ -86,12 +173,12 @@ const getDashboardData = async () => {
 router.get("/", async (req, res) => {
   try {
     // Check if user is authenticated (adjust based on your auth system)
-    if (!req.session.user || req.session.user.role !== "manager") {
+    if (!req.session.user || req.session.user.role !== "Manager") {
       return res.redirect("/login");
     }
 
     // Render the dashboard
-    res.render("dashboard", {
+    res.render("manager", {
       title: "MWF Manager Dashboard",
       user: req.session.user,
     });
@@ -103,6 +190,108 @@ router.get("/", async (req, res) => {
     });
   }
 });
+
+// ========== NEW ATTENDANT MANAGEMENT ROUTES ==========
+
+// Manager attendant management page
+router.get("/attendants", async (req, res) => {
+  try {
+    console.log("Session user:", req.session.user); // Debug line
+    console.log(
+      "User role:",
+      req.session.user ? req.session.user.role : "No user"
+    ); // Debug line
+
+    // Check if user is authenticated and is manager
+    if (!req.session.user || req.session.user.role !== "Manager") {
+      console.log("Auth failed, redirecting to login");
+      return res.redirect("/login");
+    }
+
+    // Get all attendants
+    const attendants = await userModel.find({ role: "Attendant" });
+
+    res.render("manageAttendants", {
+      title: "Manage Attendants",
+      user: req.session.user,
+      attendants: attendants,
+      success: req.query.success,
+      error: req.query.error,
+    });
+  } catch (error) {
+    console.error("Error loading attendants:", error);
+    res.redirect("/dashboard?error=Failed to load attendants");
+  }
+});
+
+// Create new attendant
+router.post("/create-attendant", async (req, res) => {
+  try {
+    // Check if user is manager
+    if (!req.session.user || req.session.user.role !== "Manager") {
+      return res.redirect("/login");
+    }
+
+    const { email, password, fullName } = req.body;
+
+    // Validate input
+    if (!email || !password || !fullName) {
+      return res.redirect(
+        "/dashboard/attendants?error=All fields are required"
+      );
+    }
+
+    // Check if attendant already exists
+    let existingUser = await userModel.findOne({ email: email });
+    if (existingUser) {
+      return res.redirect(
+        "/dashboard/attendants?error=Attendant with this email already exists"
+      );
+    }
+
+    // Create new attendant
+    const attendant = new userModel({
+      email: email,
+      fullName: fullName,
+      role: "Attendant",
+    });
+
+    await userModel.register(attendant, password, (error) => {
+      if (error) {
+        console.error("Error creating attendant:", error);
+        return res.redirect(
+          "/dashboard/attendants?error=Failed to create attendant"
+        );
+      }
+      res.redirect(
+        "/dashboard/attendants?success=Attendant created successfully"
+      );
+    });
+  } catch (error) {
+    console.error("Error creating attendant:", error);
+    res.redirect("/dashboard/attendants?error=Error creating attendant");
+  }
+});
+
+// Delete attendant
+router.post("/delete-attendant/:id", async (req, res) => {
+  try {
+    // Check if user is manager
+    if (!req.session.user || req.session.user.role !== "Manager") {
+      return res.redirect("/login");
+    }
+
+    await userModel.findByIdAndDelete(req.params.id);
+    res.redirect(
+      "/dashboard/attendants?success=Attendant deleted successfully"
+    );
+  } catch (error) {
+    console.error("Error deleting attendant:", error);
+    res.redirect("/dashboard/attendants?error=Error deleting attendant");
+  }
+});
+
+// ========== END ATTENDANT MANAGEMENT ROUTES ==========
 
 // API endpoint for dashboard data
 router.get("/api/data", async (req, res) => {
@@ -118,20 +307,13 @@ router.get("/api/data", async (req, res) => {
 // API endpoint for refreshing stock data
 router.get("/api/stock/refresh", async (req, res) => {
   try {
-    // In a real app, this would refresh stock data from your database
-    const stockData = [
-      { name: "Beds", quantity: 45, minStock: 20 },
-      { name: "Timber", quantity: 8, minStock: 15 },
-      { name: "Sofa", quantity: 67, minStock: 25 },
-      { name: "Poles", quantity: 3, minStock: 10 },
-      { name: "Dining Tables", quantity: 12, minStock: 8 },
-      { name: "Hard wood", quantity: 6, minStock: 5 },
-      { name: "Cupboards", quantity: 6, minStock: 5 },
-      { name: "Soft wood", quantity: 6, minStock: 5 },
-      { name: "Drawers", quantity: 6, minStock: 5 },
-      { name: "Home furniture", quantity: 6, minStock: 5 },
-      { name: "Office furniture", quantity: 6, minStock: 5 },
-    ];
+    // Get real stock data from database
+    const allStock = await stockModel.find({ status: "approved" }); // Only approved stock
+    const stockData = allStock.map((item) => ({
+      name: item.productName,
+      quantity: item.quantity || 0,
+      minStock: 10, // Default minimum
+    }));
 
     res.json({ success: true, data: stockData });
   } catch (error) {
@@ -144,36 +326,48 @@ router.get("/api/stock/refresh", async (req, res) => {
 router.get("/api/sales/:period", async (req, res) => {
   try {
     const { period } = req.params;
+    const currentDate = new Date();
+    const currentMonth = currentDate.getMonth() + 1;
+    const currentYear = currentDate.getFullYear();
 
-    // In a real app, query database based on period
-    let salesData;
+    let salesData = [];
+    const monthsToShow = period === "12" ? 12 : 6;
 
-    if (period === "12") {
-      // Last 12 months data
-      salesData = [
-        { month: "Oct 2023", sales: 45000000 },
-        { month: "Nov 2023", sales: 52000000 },
-        { month: "Dec 2023", sales: 48000000 },
-        { month: "Jan 2024", sales: 55000000 },
-        { month: "Feb 2024", sales: 49000000 },
-        { month: "Mar 2024", sales: 61000000 },
-        { month: "Apr 2024", sales: 58000000 },
-        { month: "May 2024", sales: 55000000 },
-        { month: "Jun 2024", sales: 52000000 },
-        { month: "Jul 2024", sales: 64000000 },
-        { month: "Aug 2024", sales: 58000000 },
-        { month: "Sep 2024", sales: 62000000 },
-      ];
-    } else {
-      // Last 6 months data (default)
-      salesData = [
-        { month: "Apr", sales: 61000000 },
-        { month: "May", sales: 55000000 },
-        { month: "Jun", sales: 58000000 },
-        { month: "Jul", sales: 52000000 },
-        { month: "Aug", sales: 64000000 },
-        { month: "Sep", sales: 58000000 },
-      ];
+    // Get all sales data
+    const allSales = await salesModel.find({});
+
+    // Generate real sales data for the specified period
+    for (let i = monthsToShow - 1; i >= 0; i--) {
+      const targetMonth = currentMonth - i;
+      const targetYear = targetMonth <= 0 ? currentYear - 1 : currentYear;
+      const adjustedMonth = targetMonth <= 0 ? targetMonth + 12 : targetMonth;
+
+      const monthSales = allSales.filter((sale) => {
+        const saleDate = new Date(sale.date);
+        return (
+          saleDate.getMonth() + 1 === adjustedMonth &&
+          saleDate.getFullYear() === targetYear
+        );
+      });
+
+      const monthTotal = monthSales.reduce((sum, sale) => {
+        const saleAmount = (sale.quantitySold || 0) * (sale.unitPrice || 0);
+        return sum + saleAmount;
+      }, 0);
+
+      const monthDate = new Date(targetYear, adjustedMonth - 1, 1);
+      const monthLabel =
+        period === "12"
+          ? monthDate.toLocaleDateString("en-US", {
+              month: "short",
+              year: "numeric",
+            })
+          : monthDate.toLocaleDateString("en-US", { month: "short" });
+
+      salesData.push({
+        month: monthLabel,
+        sales: monthTotal,
+      });
     }
 
     res.json({ success: true, data: salesData });

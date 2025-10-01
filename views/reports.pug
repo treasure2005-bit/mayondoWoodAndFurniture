@@ -18,58 +18,169 @@ html
     .container
       h2 REPORTS
 
-      
-      h3 STOCK REPORT
-      table
-        thead
-          tr
-            th Manager
-            th Manager ID
-            th Date
-            th Product Name
-            th Product Type
-            th Cost Price
-            th Product Price
-            th Quantity
-            th Supplier
-            th Quality
-            th Color
-            th Measurement
-            th Status
-        tbody
-          each item in stock
-            tr
-              td= item.managerName
-              td= item.managerId
-              td= item.date.toDateString()
-              td= item.productName
-              td= item.productType
-              td= item.costPrice
-              td= item.productPrice
-              td= item.quantity
-              td= item.supplierName
-              td= item.quality
-              td= item.color
-              td= item.measurement
-              td= item.status
+      //- Date Filter Section
+      .filter-section
+        form(method='GET' action='/reports')
+          .date-filters
+            .filter-group
+              label(for='startDate') From:
+              input(type='date' id='startDate' name='startDate' value=startDate)
+            .filter-group
+              label(for='endDate') To:
+              input(type='date' id='endDate' name='endDate' value=endDate)
+            button.btn-filter(type='submit')
+              i.fas.fa-search
+              span FILTER
+            a.btn-reset(href='/reports')
+              i.fas.fa-redo
+              span RESET
 
-      
-      h3 SALES REPORT
-      table
-        thead
-          tr
-            th Customer
-            th Product Type
-            th Product Name
-            th Qty Sold
-            th Unit Price
-            th Payment Type
-        tbody
-          each sale in sales
-            tr
-              td= sale.customerName
-              td= sale.productType
-              td= sale.productName
-              td= sale.quantitySold
-              td= sale.unitPrice
-              td= sale.paymentType
+      //- STOCK REPORT SECTION
+      .report-section
+        .report-header
+          h3 
+            i.fas.fa-boxes
+            span STOCK REPORT
+          button.btn-download(onclick='downloadStockReport()')
+            i.fas.fa-download
+            span DOWNLOAD CSV
+        
+        .table-wrapper
+          table#stockTable
+            thead
+              tr
+                th Manager
+                th Manager ID
+                th Date
+                th Product Name
+                th Product Type
+                th Cost Price
+                th Product Price
+                th Quantity
+                th Supplier
+                th Quality
+                th Color
+                th Measurement
+                th Status
+            tbody
+              if stock && stock.length
+                each item in stock
+                  tr
+                    td= item.managerName
+                    td= item.managerId
+                    td= item.date.toDateString()
+                    td= item.productName
+                    td= item.productType
+                    td= item.costPrice
+                    td= item.productPrice
+                    td= item.quantity
+                    td= item.supplierName
+                    td= item.quality
+                    td= item.color
+                    td= item.measurement
+                    td= item.status
+              else
+                tr
+                  td(colspan='12' style='text-align: center; padding: 20px; color: #6c757d;')
+                    i.fas.fa-inbox(style='font-size: 48px; margin-bottom: 10px;')
+                    br
+                    | No stock records found for selected date range
+
+      //- SALES REPORT SECTION
+      .report-section
+        .report-header
+          h3
+            i.fas.fa-chart-line
+            span SALES REPORT
+          button.btn-download(onclick='downloadSalesReport()')
+            i.fas.fa-download
+            span DOWNLOAD CSV
+        
+        .table-wrapper
+          table#salesTable
+            thead
+              tr
+                th Customer
+                th Product Type
+                th Product Name
+                th Qty Sold
+                th Unit Price
+                th Payment Type
+                th Total Amount
+            tbody
+              if sales && sales.length
+                each sale in sales
+                  tr
+                    td= sale.customerName
+                    td= sale.productType
+                    td= sale.productName
+                    td= sale.quantitySold
+                    td= sale.unitPrice
+                    td= sale.paymentType
+                    td= (sale.quantitySold * sale.unitPrice).toLocaleString()
+              else
+                tr
+                  td(colspan='7' style='text-align: center; padding: 20px; color: #6c757d;')
+                    i.fas.fa-inbox(style='font-size: 48px; margin-bottom: 10px;')
+                    br
+                    | No sales records found for selected date range
+
+    //- JavaScript for CSV Download
+    script.
+      function downloadStockReport() {
+        const table = document.getElementById('stockTable');
+        const rows = table.querySelectorAll('tr');
+        let csv = [];
+        
+        for (let i = 0; i < rows.length; i++) {
+          const row = [], cols = rows[i].querySelectorAll('td, th');
+          for (let j = 0; j < cols.length; j++) {
+            let data = cols[j].innerText.replace(/(\r\n|\n|\r)/gm, '').replace(/(\s\s)/gm, ' ');
+            data = data.replace(/"/g, '""');
+            row.push('"' + data + '"');
+          }
+          csv.push(row.join(','));
+        }
+        
+        const csvContent = csv.join('\n');
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        
+        const today = new Date().toISOString().split('T')[0];
+        link.setAttribute('href', url);
+        link.setAttribute('download', `stock_report_${today}.csv`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+
+      function downloadSalesReport() {
+        const table = document.getElementById('salesTable');
+        const rows = table.querySelectorAll('tr');
+        let csv = [];
+        
+        for (let i = 0; i < rows.length; i++) {
+          const row = [], cols = rows[i].querySelectorAll('td, th');
+          for (let j = 0; j < cols.length; j++) {
+            let data = cols[j].innerText.replace(/(\r\n|\n|\r)/gm, '').replace(/(\s\s)/gm, ' ');
+            data = data.replace(/"/g, '""');
+            row.push('"' + data + '"');
+          }
+          csv.push(row.join(','));
+        }
+        
+        const csvContent = csv.join('\n');
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        
+        const today = new Date().toISOString().split('T')[0];
+        link.setAttribute('href', url);
+        link.setAttribute('download', `sales_report_${today}.csv`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }

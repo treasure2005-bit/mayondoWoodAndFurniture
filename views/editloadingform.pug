@@ -1,0 +1,116 @@
+doctype html
+html
+  head
+    meta(charset='UTF-8')
+    meta(name='viewport' content='width=device-width, initial-scale=1.0')
+    title MWF - Edit Loading
+    link(rel='stylesheet' href='/css/loadingform.css')
+    link(href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css' rel='stylesheet')
+  body
+    nav.navbar
+      .nav-brand
+      .nav-links
+      .buttons
+        a(href='/attendant')
+          i.fas.fa-home
+          |  Dashboard
+        a.logout(href='/login')
+          i.fas.fa-sign-out-alt
+          |  Logout
+
+    .card.loading-card
+      .card-header
+        .card-title
+          h3 EDIT LOADING OPERATION
+          p Update or delete a loading record
+
+      .card-content
+        form#editLoadingForm(action=`/loadingform/${loading._id}/update` method='POST')
+          .form-grid
+            .form-section
+              h4 Loading Details
+              .form-group
+                label(for='loadingDate') Date & Time
+                input#loadingDate(type='datetime-local' name='loadingDate' value=loading.loadingDate required)
+
+              .form-group
+                label(for='vehicleInfo') Vehicle Information
+                input#vehicleInfo(type='text' name='vehicleInfo' value=loading.vehicleInfo required)
+
+              .form-group
+                label(for='driverName') Driver Name
+                input#driverName(type='text' name='driverName' value=loading.driverName required)
+
+              .form-group
+                label(for='destination') Destination
+                input#destination(type='text' name='destination' value=loading.destination required)
+
+            .form-section
+              h4 Products to Load
+              .form-group
+                label(for='productCategory') Product Category
+                select#productCategory(name='productCategory' required)
+                  option(value='') Select category
+                  option(value='timber' selected=loading.productCategory=='timber') Wood Products
+                  option(value='furniture' selected=loading.productCategory=='furniture') Furniture 
+
+              .form-group
+                label(for='productName') Product Name
+                select#productName(name='productName')
+                  option(value='') Select product
+                  option(value='Beds' selected=loading.productName=='Beds') Beds
+                  option(value='Timber' selected=loading.productName=='Timber') Timber
+                  option(value='Sofa' selected=loading.productName=='Sofa') Sofa
+                  option(value='Poles' selected=loading.productName=='Poles') Poles
+                  option(value='Dining tables' selected=loading.productName=='Dining tables') Dining Tables
+                  option(value='hard wood' selected=loading.productName=='hard wood') Hard wood
+                  option(value='cupboards' selected=loading.productName=='cupboards') Cupboards
+                  option(value='soft wood' selected=loading.productName=='soft wood') Soft wood
+                  option(value='Drawers' selected=loading.productName=='Drawers') Drawers
+                  option(value='Home furniture' selected=loading.productName=='Home furniture') Home furniture
+                  option(value='Office furniture' selected=loading.productName=='Office furniture') Office furniture
+
+              .form-row
+                .form-group.half-width
+                  label(for='quantity') Quantity
+                  input#quantity(type='number' name='quantity' min='1' value=loading.quantity required)
+
+                .form-group.half-width
+                  label(for='unit') Unit
+                  select#unit(name='unit' required)
+                    option(value='') Select unit
+                    option(value='pieces' selected=loading.unit=='pieces') Pieces
+                    option(value='kg' selected=loading.unit=='kg') Kilograms
+                    option(value='tons' selected=loading.unit=='tons') Tons
+                    option(value='cubic_meters' selected=loading.unit=='cubic_meters') Cubic Meters
+                    option(value='sets' selected=loading.unit=='sets') Sets
+
+            .form-section
+              h4 Additional Information
+              .form-group
+                label(for='attendantName') Attendant Name
+                input#attendantName(type='text' name='attendantName' value=loading.attendantName required)
+
+              .form-group
+                label(for='specialInstructions') Special Instructions
+                textarea#specialInstructions(name='specialInstructions' rows='3')=loading.specialInstructions
+
+              .form-group
+                label(for='priority') Priority Level
+                select#priority(name='priority')
+                  option(value='normal' selected=loading.priority=='normal') Normal
+                  option(value='urgent' selected=loading.priority=='urgent') Urgent
+                  option(value='low' selected=loading.priority=='low') Low Priority
+
+          .card-actions
+            button.btn-secondary(type='button' onclick='window.history.back()')
+              i.fas.fa-arrow-left
+              | Cancel
+            button.btn-primary(type='submit')
+              i.fas.fa-save
+              | Update Loading
+
+        form#deleteLoadingForm(action=`/loadingform/${loading._id}/delete` method='POST' style='margin-top:1rem;')
+          button.btn-danger(type='submit' onclick='return confirm("Are you sure you want to delete this record?")')
+            i.fas.fa-trash
+            | Delete Loading

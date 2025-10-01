@@ -1,0 +1,221 @@
+doctype html
+html
+head
+  meta(charset='UTF-8')
+  meta(name='viewport' content='width=device-width, initial-scale=1.0')
+  title MWF - Offloading form
+  link(rel='stylesheet' href='/css/offloadingform.css')
+  link(href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css' rel='stylesheet')
+  nav.navbar
+    .nav-brand
+    .nav-links
+    .buttons
+      a(href='/attendant')
+        i.fas.fa-home
+        |  Dashboard
+      a.logout(href='/login')
+        i.fas.fa-sign-out-alt
+        |  Logout
+  .container.fade-in
+    .dashboard-page
+      .dashboard-grid
+        
+        //- Offloading Operations Card
+        .card.offloading-card
+          .card-header
+            .card-icon
+              i.fas.fa-truck-ramp
+            .card-title
+              h3 New Offloading Operation
+              p Record products being offloaded from delivery
+          .card-content
+            form#offloadingForm( action='/offloadingform' method='POST')
+              .form-grid
+                
+                //- Delivery Reference Section
+                .form-section
+                  .section-header
+                    i.fas.fa-clipboard-list
+                    h4 Delivery Information
+                  .form-group
+                    label(for='deliveryReference') Delivery Reference
+                    input#deliveryReference(type='text' name='deliveryReference' placeholder='Loading reference number or ID' required)
+                    small.help-text Enter the loading operation ID or reference number
+                  
+                  .form-row
+                    .form-group
+                      label(for='offloadingDate') Offloading Date & Time
+                      input#offloadingDate(type='datetime-local' name='offloadingDate' required)
+                    
+                    .form-group
+                      label(for='vehicleInfo') Vehicle Information
+                      input#vehicleInfo(type='text' name='vehicleInfo' placeholder='Vehicle plate/ID' required)
+                  
+                  .form-group
+                    label(for='driverName') Driver Name
+                    input#driverName(type='text' name='driverName' placeholder='Driver name' required)
+
+                //- Product Verification Section
+                .form-section
+                  .section-header
+                    i.fas.fa-boxes
+                    h4 Product Verification
+                  .form-group
+                    label(for='productCategory') Product Category
+                    select#productCategory(name='productCategory' required)
+                      option(value='') Select category...
+                      option(value='timber') Wood Products (Timber, Poles, Hard/Soft woods)
+                      option(value='furniture') Furniture (Beds, Sofas, Tables, Cupboards)
+                      option(value='other') Other Products
+                  
+                  .form-group
+                    label(for='productName') Product Name/Description
+                    input#productName(type='text' name='productName' placeholder='Product details' required)
+                  
+                  .form-row
+                    .form-group
+                      label(for='expectedQuantity') Expected Quantity
+                      input#expectedQuantity(type='number' name='expectedQuantity' min='0' placeholder='From loading sheet')
+                      small.help-text What was supposed to be delivered
+                    
+                    .form-group
+                      label(for='actualQuantity') Actual Quantity Received
+                      input#actualQuantity(type='number' name='actualQuantity' min='0' required)
+                      small.help-text What was actually received
+                  
+                  .form-row
+                    .form-group
+                      label(for='unit') Unit of Measurement
+                      select#unit(name='unit' required)
+                        option(value='') Select unit...
+                        option(value='pieces') Pieces
+                        option(value='kg') Kilograms
+                        option(value='tons') Tons
+                        option(value='cubic_meters') Cubic Meters
+                        option(value='sets') Sets
+                    
+                    .form-group
+                      label(for='discrepancy') Quantity Status
+                      select#discrepancy(name='discrepancy' required onchange='toggleDiscrepancyAlert(this)')
+                        option(value='') Check quantities...
+                        option(value='match') ✓ Quantities Match
+                        option(value='shortage') ⚠ Shortage (Less than expected)
+                        option(value='excess') ⚠ Excess (More than expected)
+                  
+                  .alert.alert-warning#discrepancyAlert(style='display: none;')
+                    i.fas.fa-exclamation-triangle
+                    span Please document the quantity discrepancy in additional notes
+
+                //- Condition Assessment Section
+                .form-section
+                  .section-header
+                    i.fas.fa-search
+                    h4 Product Condition Assessment
+                  .form-group
+                    label(for='productCondition') Overall Condition
+                    select#productCondition(name='productCondition' required onchange='toggleDamageFields(this)')
+                      option(value='') Assess condition...
+                      option(value='excellent') ✓ Excellent - No issues
+                      option(value='good') ✓ Good - Minor wear
+                      option(value='fair') ⚠ Fair - Some damage
+                      option(value='poor') ⚠ Poor - Significant damage
+                      option(value='damaged') ✗ Damaged - Unusable
+                  
+                  .damage-fields#damageFields(style='display: none;')
+                    .form-group
+                      label(for='damageDescription') Damage/Issues Description
+                      textarea#damageDescription(name='damageDescription' rows='3' placeholder='Describe any damage, missing parts, or issues found in detail...')
+                    
+                    .form-group
+                      .checkbox-group
+                        input#photosRequired(type='checkbox' name='photosRequired')
+                        label(for='photosRequired') 
+                          i.fas.fa-camera
+                          | Photos required for damage documentation
+
+                //- Offloading Details Section
+                .form-section
+                  .section-header
+                    i.fas.fa-warehouse
+                    h4 Offloading Details
+                  .form-row
+                    .form-group
+                      label(for='attendantName') Receiving Attendant
+                      input#attendantName(type='text' name='attendantName' placeholder='Your name' required)
+                    
+                    .form-group
+                      label(for='storageLocation') Storage Location
+                      input#storageLocation(type='text' name='storageLocation' placeholder='Where products will be stored' required)
+                  
+                  .form-group
+                    label(for='receivedBy') Received By (Customer/Staff)
+                    input#receivedBy(type='text' name='receivedBy' placeholder='Person receiving delivery')
+                  
+                  .form-group
+                    label(for='additionalNotes') Additional Notes
+                    textarea#additionalNotes(name='additionalNotes' rows='4' placeholder='Any additional observations, discrepancy explanations, or special notes...')
+
+              //- Form Actions
+              .card-actions
+                a.btn-secondary(href='/attendantstock')
+                  i.fas.fa-arrow-left
+                  | Back to Dashboard
+                button.btn-primary(type='submit')
+                  i.fas.fa-check-circle
+                  | Complete Offloading
+
+  //- //- JavaScript for form interactions
+  //- script.
+  //-   // Set current date/time as default
+  //-   document.addEventListener('DOMContentLoaded', function() {
+  //-     const now = new Date();
+  //-     now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+  //-     document.getElementById('offloadingDate').value = now.toISOString().slice(0, 16);
+  //-   });
+    
+  //-   // Toggle discrepancy alert
+  //-   function toggleDiscrepancyAlert(select) {
+  //-     const alert = document.getElementById('discrepancyAlert');
+  //-     if (select.value === 'shortage' || select.value === 'excess') {
+  //-       alert.style.display = 'block';
+  //-     } else {
+  //-       alert.style.display = 'none';
+  //-     }
+  //-   }
+    
+  //-   // Toggle damage fields
+  //-   function toggleDamageFields(select) {
+  //-     const damageFields = document.getElementById('damageFields');
+  //-     if (select.value === 'fair' || select.value === 'poor' || select.value === 'damaged') {
+  //-       damageFields.style.display = 'block';
+  //-       document.getElementById('damageDescription').required = true;
+  //-     } else {
+  //-       damageFields.style.display = 'none';
+  //-       document.getElementById('damageDescription').required = false;
+  //-     }
+  //-   }
+    
+  //-   // Auto-calculate discrepancy
+  //-   function checkQuantities() {
+  //-     const expected = parseInt(document.getElementById('expectedQuantity').value) || 0;
+  //-     const actual = parseInt(document.getElementById('actualQuantity').value) || 0;
+  //-     const discrepancySelect = document.getElementById('discrepancy');
+      
+  //-     if (expected > 0 && actual > 0) {
+  //-       if (actual === expected) {
+  //-         discrepancySelect.value = 'match';
+  //-       } else if (actual < expected) {
+  //-         discrepancySelect.value = 'shortage';
+  //-       } else {
+  //-         discrepancySelect.value = 'excess';
+  //-       }
+  //-       toggleDiscrepancyAlert(discrepancySelect);
+  //-     }
+  //-   }
+    
+  //-   // Add event listeners for quantity auto-check
+  //-   document.getElementById('expectedQuantity').addEventListener('input', checkQuantities);
+  //-   document.getElementById('actualQuantity').addEventListener('input', checkQuantities);
+
+
+    

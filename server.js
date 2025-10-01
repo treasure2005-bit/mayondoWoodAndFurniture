@@ -18,6 +18,7 @@ const attendantstockModel = require("./models/attendantstockModel")
 // import routes
 const dashboardRoutes = require("./routes/dashboardRoutes");
 const authRoutes = require("./routes/authRoutes");
+const attendantsRoutes = require("./routes/attendantsRoutes");
 const salesRoutes = require("./routes/salesRoutes");
 const stockRoutes = require("./routes/stockRoutes");
 const userRoutes = require("./routes/userRoutes");
@@ -79,8 +80,9 @@ passport.deserializeUser(UserModel.deserializeUser());
 //USING IMPORTED ROUTES
 
 // app.use("/",studyRoutes)
-app.use("/dashboardRoutes", dashboardRoutes);
+app.use("/dashboard", dashboardRoutes);
 app.use("/", authRoutes);
+app.use("/", attendantsRoutes);
 app.use("/", salesRoutes);
 app.use("/", stockRoutes);
 app.use("/userRoutes", userRoutes);

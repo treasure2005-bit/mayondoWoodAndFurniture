@@ -138,7 +138,8 @@ html(lang='en')
             a.action-item(href="/stock-report")
               .action-icon 
                 i.fas.fa-chart-bar 
-              .action-con    
+              .action-content 
+                  h4 Generate stock report from the Attendant    
             
             a.action-item(href='/suppliersTable')
               .action-icon
@@ -146,6 +147,24 @@ html(lang='en')
               .action-content
                 h4 Manage Suppliers
                 p Update supplier information
+            a.action-item(href='/dashboard/attendants')
+              .action-icon
+                i.fas.fa-users
+              .action-content
+                h4 Manage Attendants
+                p Add and manage staff accounts  
+            a.action-item(href='/stocklist')
+              .action-icon
+                i.fas.fa-boxes
+              .action-content
+                h4 View Stock list
+                p Edit/Delete/View stock 
+            a.action-item(href='/recordingSales')
+              .action-icon
+                i.fas.fa-coins
+              .action-content
+                h4 Add Sales
+                p Record new sales transactions
 
         // Recent Transactions
         .recent-activity

@@ -1,316 +1,306 @@
-// Data storage
-        let stockData = JSON.parse(localStorage.getItem('mwf_stock') || '[]');
-        let salesData = JSON.parse(localStorage.getItem('mwf_sales') || '[]');
-        let loadingData = JSON.parse(localStorage.getItem('mwf_loading') || '[]');
-        let offloadingData = JSON.parse(localStorage.getItem('mwf_offloading') || '[]');
-        let reports = JSON.parse(localStorage.getItem('mwf_reports') || '[]');
+// Attendant Dashboard JavaScript - MongoDB Version
 
-        // Tab switching
-        function showTab(tabName) {
-            // Hide all tabs
-            const tabs = document.querySelectorAll('.tab-content');
-            tabs.forEach(tab => tab.classList.remove('active'));
-            
-            // Remove active class from all nav tabs
-            const navTabs = document.querySelectorAll('.nav-tab');
-            navTabs.forEach(tab => tab.classList.remove('active'));
-            
-            // Show selected tab
-            document.getElementById(tabName).classList.add('active');
-            event.target.classList.add('active');
-        }
+// Initialize dashboard when page loads
+document.addEventListener("DOMContentLoaded", function () {
+  updateTime();
+  setInterval(updateTime, 1000);
+  loadDashboardStats();
+  loadRecentActivity();
+  animateCards();
+});
 
-        // Stock form handling
-        document.getElementById('stockForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const stockItem = {
-                id: Date.now(),
-                productName: document.getElementById('stockProductName').value,
-                productType: document.getElementById('stockProductType').value,
-                costPrice: parseFloat(document.getElementById('stockCostPrice').value),
-                quantity: parseInt(document.getElementById('stockQuantity').value),
-                price: parseFloat(document.getElementById('stockPrice').value),
-                supplier: document.getElementById('stockSupplier').value,
-                date: document.getElementById('stockDate').value,
-                quality: document.getElementById('stockQuality').value,
-                color: document.getElementById('stockColor').value,
-                measurements: document.getElementById('stockMeasurements').value
-            };
-            
-            stockData.push(stockItem);
-            localStorage.setItem('mwf_stock', JSON.stringify(stockData));
-            
-            updateStockTable();
-            updateProductsTable();
-            this.reset();
-            alert('Stock recorded successfully!');
-        });
+// Update current time display
+function updateTime() {
+  const timeDisplay = document.getElementById("currentTime");
+  if (timeDisplay) {
+    const now = new Date();
+    const options = {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    };
+    timeDisplay.textContent = now.toLocaleDateString("en-US", options);
+  }
+}
 
-        // Sales form handling
-        document.getElementById('salesForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const quantity = parseInt(document.getElementById('salesQuantity').value);
-            const unitPrice = parseFloat(document.getElementById('unitPrice').value);
-            const transport = document.getElementById('transportService').checked;
-            
-            let total = quantity * unitPrice;
-            if (transport) {
-                total *= 1.05; // Add 5% for transport
-            }
-            
-            const saleItem = {
-                id: Date.now(),
-                customer: document.getElementById('customerName').value,
-                productType: document.getElementById('salesProductType').value,
-                productName: document.getElementById('salesProductName').value,
-                quantity: quantity,
-                unitPrice: unitPrice,
-                total: total.toFixed(2),
-                date: document.getElementById('salesDate').value,
-                paymentType: document.getElementById('paymentType').value,
-                agent: document.getElementById('salesAgent').value,
-                transport: transport
-            };
-            
-            salesData.push(saleItem);
-            localStorage.setItem('mwf_sales', JSON.stringify(salesData));
-            
-            updateSalesTable();
-            this.reset();
-            alert('Sale recorded successfully!');
-        });
+// Load dashboard statistics from MongoDB
+async function loadDashboardStats() {
+  try {
+    showLoading();
+    const response = await fetch("/api/attendant/stats");
+    const data = await response.json();
 
-        // Loading form handling
-        document.getElementById('loadingForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const loadingItem = {
-                id: Date.now(),
-                productName: document.getElementById('loadProductName').value,
-                quantity: parseInt(document.getElementById('loadQuantity').value),
-                destination: document.getElementById('loadDestination').value,
-                date: document.getElementById('loadDate').value,
-                vehicle: document.getElementById('loadVehicle').value,
-                status: 'Loaded'
-            };
-            
-            loadingData.push(loadingItem);
-            localStorage.setItem('mwf_loading', JSON.stringify(loadingData));
-            
-            updateLoadingTable();
-            this.reset();
-            alert('Loading recorded successfully!');
-        });
+    if (data.success) {
+      updateStatCards(data.stats);
+    } else {
+      console.error("Error loading stats:", data.message);
+      showNotification("Error loading dashboard stats", "error");
+    }
+  } catch (error) {
+    console.error("Error fetching dashboard stats:", error);
+    showNotification("Failed to load dashboard data", "error");
+  } finally {
+    hideLoading();
+  }
+}
 
-        // Offloading form handling
-        document.getElementById('offloadingForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const offloadingItem = {
-                id: Date.now(),
-                productName: document.getElementById('offloadProductName').value,
-                quantity: parseInt(document.getElementById('offloadQuantity').value),
-                source: document.getElementById('offloadSource').value,
-                date: document.getElementById('offloadDate').value,
-                vehicle: document.getElementById('offloadVehicle').value,
-                status: 'Offloaded'
-            };
-            
-            offloadingData.push(offloadingItem);
-            localStorage.setItem('mwf_offloading', JSON.stringify(offloadingData));
-            
-            updateOffloadingTable();
-            this.reset();
-            alert('Offloading recorded successfully!');
-        });
+// Update stat cards with animated numbers
+function updateStatCards(stats) {
+  const statCards = document.querySelectorAll(".stat-number");
 
-        // Update tables
-        function updateStockTable() {
-            const tbody = document.getElementById('stockTableBody');
-            tbody.innerHTML = '';
-            
-            stockData.forEach(item => {
-                const row = tbody.insertRow();
-                row.innerHTML = `
-                    <td>${item.productName}</td>
-                    <td>${item.productType}</td>
-                    <td>${item.quantity}</td>
-                    <td>$${item.costPrice}</td>
-                    <td>$${item.price}</td>
-                    <td>${item.supplier}</td>
-                    <td>${item.date}</td>
-                    <td>${item.quality}</td>
-                `;
-            });
-        }
+  if (statCards[0]) {
+    animateNumber(statCards[0], stats.todaySales);
+  }
+  if (statCards[1]) {
+    animateNumber(statCards[1], stats.todayRevenue, "UGX ");
+  }
+  if (statCards[2]) {
+    animateNumber(statCards[2], stats.stockItems);
+  }
+  if (statCards[3]) {
+    animateNumber(statCards[3], stats.lowStockAlerts);
 
-        function updateSalesTable() {
-            const tbody = document.getElementById('salesTableBody');
-            tbody.innerHTML = '';
-            
-            salesData.forEach(item => {
-                const row = tbody.insertRow();
-                row.innerHTML = `
-                    <td>${item.customer}</td>
-                    <td>${item.productName}</td>
-                    <td>${item.productType}</td>
-                    <td>${item.quantity}</td>
-                    <td>$${item.unitPrice}</td>
-                    <td>$${item.total}${item.transport ? ' (+5% transport)' : ''}</td>
-                    <td>${item.date}</td>
-                    <td>${item.paymentType}</td>
-                    <td>${item.agent}</td>
-                `;
-            });
-        }
+    // Add warning class if low stock alerts > 0
+    const parentCard = statCards[3].closest(".stat-card");
+    if (stats.lowStockAlerts > 0) {
+      parentCard.classList.add("alert-warning");
+    } else {
+      parentCard.classList.remove("alert-warning");
+    }
+  }
+}
 
-        function updateProductsTable() {
-            const tbody = document.getElementById('productsTableBody');
-            tbody.innerHTML = '';
-            
-            stockData.forEach(item => {
-                const row = tbody.insertRow();
-                const status = item.quantity > 0 ? 'Available' : 'Out of Stock';
-                row.innerHTML = `
-                    <td>${item.productName}</td>
-                    <td>${item.productType}</td>
-                    <td>${item.quantity}</td>
-                    <td>$${item.costPrice}</td>
-                    <td>$${item.price}</td>
-                    <td>${item.supplier}</td>
-                    <td>${item.quality}</td>
-                    <td>${status}</td>
-                `;
-            });
-        }
+// Animate number counting up
+function animateNumber(element, target, prefix = "", duration = 1000) {
+  const start = 0;
+  const increment = target / (duration / 16);
+  let current = start;
 
-        function updateLoadingTable() {
-            const tbody = document.getElementById('loadingTableBody');
-            tbody.innerHTML = '';
-            
-            loadingData.forEach(item => {
-                const row = tbody.insertRow();
-                row.innerHTML = `
-                    <td>${item.productName}</td>
-                    <td>${item.quantity}</td>
-                    <td>${item.destination}</td>
-                    <td>${item.date}</td>
-                    <td>${item.vehicle}</td>
-                    <td>${item.status}</td>
-                `;
-            });
-        }
+  const timer = setInterval(() => {
+    current += increment;
+    if (current >= target) {
+      current = target;
+      clearInterval(timer);
+    }
 
-        function updateOffloadingTable() {
-            const tbody = document.getElementById('offloadingTableBody');
-            tbody.innerHTML = '';
-            
-            offloadingData.forEach(item => {
-                const row = tbody.insertRow();
-                row.innerHTML = `
-                    <td>${item.productName}</td>
-                    <td>${item.quantity}</td>
-                    <td>${item.source}</td>
-                    <td>${item.date}</td>
-                    <td>${item.vehicle}</td>
-                    <td>${item.status}</td>
-                `;
-            });
-        }
+    if (prefix === "UGX ") {
+      element.textContent = prefix + Math.floor(current).toLocaleString();
+    } else {
+      element.textContent = Math.floor(current);
+    }
+  }, 16);
+}
 
-        // Report generation
-        function generateStockReport() {
-            const reportId = 'STOCK-' + Date.now();
-            const report = {
-                id: reportId,
-                type: 'stock',
-                data: [...stockData],
-                generatedBy: 'attendant',
-                generatedOn: new Date().toISOString(),
-                status: 'available_for_manager'
-            };
-            
-            reports.push(report);
-            localStorage.setItem('mwf_reports', JSON.stringify(reports));
-            
-            document.getElementById('stockReportId').textContent = reportId;
-            document.getElementById('stockReportDate').textContent = new Date().toLocaleString();
-            document.getElementById('stockReportSection').style.display = 'block';
-            
-            alert('Stock report generated successfully! Report ID: ' + reportId);
-        }
+// Load recent activity from MongoDB
+async function loadRecentActivity() {
+  try {
+    const response = await fetch("/api/attendant/recent-activity");
+    const data = await response.json();
 
-        function generateSalesReport() {
-            const reportId = 'SALES-' + Date.now();
-            const report = {
-                id: reportId,
-                type: 'sales',
-                data: [...salesData],
-                generatedBy: 'attendant',
-                generatedOn: new Date().toISOString(),
-                status: 'available_for_manager'
-            };
-            
-            reports.push(report);
-            localStorage.setItem('mwf_reports', JSON.stringify(reports));
-            
-            document.getElementById('salesReportId').textContent = reportId;
-            document.getElementById('salesReportDate').textContent = new Date().toLocaleString();
-            document.getElementById('salesReportSection').style.display = 'block';
-            
-            alert('Sales report generated successfully! Report ID: ' + reportId);
-        }
+    if (data.success) {
+      displayRecentActivity(data.activities);
+    } else {
+      console.error("Error loading recent activity:", data.message);
+      displayActivityError();
+    }
+  } catch (error) {
+    console.error("Error fetching recent activity:", error);
+    displayActivityError();
+  }
+}
 
-        // Receipt generation
-        function generateReceipt() {
-            const customer = document.getElementById('receiptCustomer').value;
-            if (!customer) {
-                alert('Please enter customer name');
-                return;
-            }
-            
-            // Get the latest sale for this customer or use form data
-            const customerSales = salesData.filter(sale => sale.customer.toLowerCase() === customer.toLowerCase());
-            
-            if (customerSales.length === 0) {
-                alert('No sales found for this customer');
-                return;
-            }
-            
-            const latestSale = customerSales[customerSales.length - 1];
-            
-            const receiptContent = `
-                <p><strong>Receipt #:</strong> RCP-${latestSale.id}</p>
-                <p><strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
-                <p><strong>Customer:</strong> ${latestSale.customer}</p>
-                <hr>
-                <p><strong>Product Details:</strong></p>
-                <p>Product Name: ${latestSale.productName}</p>
-                <p>Product Type: ${latestSale.productType}</p>
-                <p>Quantity: ${latestSale.quantity}</p>
-                <p>Unit Price: $${latestSale.unitPrice}</p>
-                ${latestSale.transport ? '<p>Transport Service: +5%</p>' : ''}
-                <p><strong>Total Amount: $${latestSale.total}</strong></p>
-                <hr>
-                <p><strong>Payment Method:</strong> ${latestSale.paymentType}</p>
-                <p><strong>Sales Agent:</strong> ${latestSale.agent}</p>
-                <p><strong>Date of Sale:</strong> ${latestSale.date}</p>
-                <hr>
-                <p style="text-align: center; margin-top: 20px;">Thank you for your business!</p>
-            `;
-            
-            document.getElementById('receiptContent').innerHTML = receiptContent;
-            document.getElementById('receiptDisplay').style.display = 'block';
-        }
+// Display recent activity items
+function displayRecentActivity(activities) {
+  const activityContainer = document.getElementById("recentActivity");
 
-        function printReceipt() {
-            const receiptElement = document.getElementById('receiptDisplay');
-            if (receiptElement.style.display === 'none') {
-                alert('Please generate a receipt first');
-                return;
-            }
-        };
-            const printWindow = window.open('', '_blank');
-            printWindow.document.write
+  if (!activityContainer) return;
+
+  if (activities.length === 0) {
+    activityContainer.innerHTML = `
+      <div class="activity-item empty">
+        <div class="activity-icon">
+          <i class="fas fa-info-circle"></i>
+        </div>
+        <div class="activity-content">
+          <div class="activity-title">No recent activity</div>
+          <div class="activity-time">Start by recording sales or managing stock</div>
+        </div>
+      </div>
+    `;
+    return;
+  }
+
+  activityContainer.innerHTML = activities
+    .map(
+      (activity) => `
+    <div class="activity-item ${activity.type}">
+      <div class="activity-icon">
+        <i class="fas ${activity.icon}"></i>
+      </div>
+      <div class="activity-content">
+        <div class="activity-title">${escapeHtml(activity.title)}</div>
+        <div class="activity-description">${escapeHtml(
+          activity.description
+        )}</div>
+        <div class="activity-time">${escapeHtml(activity.time)}</div>
+      </div>
+    </div>
+  `
+    )
+    .join("");
+}
+
+// Display error message for activity
+function displayActivityError() {
+  const activityContainer = document.getElementById("recentActivity");
+  if (activityContainer) {
+    activityContainer.innerHTML = `
+      <div class="activity-item error">
+        <div class="activity-icon">
+          <i class="fas fa-exclamation-triangle"></i>
+        </div>
+        <div class="activity-content">
+          <div class="activity-title">Error loading activities</div>
+          <div class="activity-time">Please refresh the page</div>
+        </div>
+      </div>
+    `;
+  }
+}
+
+// Show loading overlay
+function showLoading() {
+  const overlay = document.getElementById("loadingOverlay");
+  if (overlay) {
+    overlay.style.display = "flex";
+  }
+}
+
+// Hide loading overlay
+function hideLoading() {
+  const overlay = document.getElementById("loadingOverlay");
+  if (overlay) {
+    overlay.style.display = "none";
+  }
+}
+
+// Animate cards on page load
+function animateCards() {
+  const cards = document.querySelectorAll(".card");
+  cards.forEach((card, index) => {
+    card.style.opacity = "0";
+    card.style.transform = "translateY(20px)";
+
+    setTimeout(() => {
+      card.style.transition = "all 0.5s ease";
+      card.style.opacity = "1";
+      card.style.transform = "translateY(0)";
+    }, index * 100);
+  });
+}
+
+// Refresh dashboard data
+function refreshDashboard() {
+  loadDashboardStats();
+  loadRecentActivity();
+
+  // Show success message
+  showNotification("Dashboard refreshed successfully", "success");
+}
+
+// Show notification
+function showNotification(message, type = "info") {
+  // Remove any existing notifications
+  const existingNotifications = document.querySelectorAll(".notification");
+  existingNotifications.forEach((notif) => notif.remove());
+
+  const notification = document.createElement("div");
+  notification.className = `notification ${type}`;
+  notification.innerHTML = `
+    <i class="fas ${
+      type === "success"
+        ? "fa-check-circle"
+        : type === "error"
+        ? "fa-exclamation-circle"
+        : "fa-info-circle"
+    }"></i>
+    <span>${escapeHtml(message)}</span>
+  `;
+
+  document.body.appendChild(notification);
+
+  setTimeout(() => {
+    notification.style.opacity = "1";
+    notification.style.transform = "translateY(0)";
+  }, 100);
+
+  setTimeout(() => {
+    notification.style.opacity = "0";
+    notification.style.transform = "translateY(-20px)";
+    setTimeout(() => notification.remove(), 300);
+  }, 3000);
+}
+
+// Escape HTML to prevent XSS
+function escapeHtml(text) {
+  const map = {
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#039;",
+  };
+  return text.replace(/[&<>"']/g, (m) => map[m]);
+}
+
+// Handle quick action clicks with animation
+document.addEventListener("click", function (e) {
+  const quickAction = e.target.closest(".quick-action");
+  if (quickAction) {
+    // Add loading animation
+    quickAction.style.transform = "scale(0.95)";
+    setTimeout(() => {
+      quickAction.style.transform = "scale(1)";
+    }, 100);
+  }
+});
+
+// Add hover effects to cards
+const cards = document.querySelectorAll(".card");
+cards.forEach((card) => {
+  card.addEventListener("mouseenter", function () {
+    if (this.style.opacity === "1") {
+      // Only animate if card is visible
+      this.style.transform = "translateY(-5px)";
+    }
+  });
+
+  card.addEventListener("mouseleave", function () {
+    if (this.style.opacity === "1") {
+      this.style.transform = "translateY(0)";
+    }
+  });
+});
+
+// Auto-refresh dashboard every 5 minutes
+setInterval(() => {
+  loadDashboardStats();
+  loadRecentActivity();
+  console.log("Dashboard auto-refreshed");
+}, 300000);
+
+// Handle page visibility change - refresh when user comes back
+document.addEventListener("visibilitychange", function () {
+  if (!document.hidden) {
+    loadDashboardStats();
+    loadRecentActivity();
+  }
+});
+
+// Export functions for global use
+window.loadRecentActivity = loadRecentActivity;
+window.refreshDashboard = refreshDashboard;

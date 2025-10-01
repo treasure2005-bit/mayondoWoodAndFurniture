@@ -8,11 +8,13 @@ html
   body
     .navbar
       a(href='/dashboard') BACK
-      a(href='/registerStock') ADD STOCK
       a(href='/logout') LOGOUT
 
     .container
-      h3 CURRENT STOCK
+      .header-section
+        h3 CURRENT STOCK
+        a.btn.btn-add-stock(href='/registerStock') 
+          | ➕ ADD STOCK
       
       table#stockTable
         thead

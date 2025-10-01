@@ -1,11 +1,9 @@
-/* Reset */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-/* General Page Layout */
 body {
   background-image: url("/images/landingpage.jpg");
   background-size: cover;
@@ -19,7 +17,6 @@ body {
   flex-direction: column;
 }
 
-/* Navbar */
 .navbar {
   width: 100%;
   background: #d6d6d6;
@@ -34,18 +31,20 @@ body {
   text-decoration: none;
   font-size: 14px;
   font-weight: bold;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .navbar a:hover {
   text-decoration: underline;
 }
 
-/* Container for all reports */
 .container {
   max-width: 1200px;
   margin: 40px auto;
   padding: 20px;
-  background: #cfe4f9; /* soft blue background like your stock page */
+  background: #cfe4f9;
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
@@ -101,4 +100,187 @@ table tbody tr:nth-child(even) {
 table tbody tr:hover {
   background-color: #eef6ff;
   transition: 0.3s;
+}
+
+/* ===== Date Filter Section ===== */
+.filter-section {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 30px;
+}
+
+.date-filters {
+  display: flex;
+  gap: 15px;
+  align-items: flex-end;
+  flex-wrap: wrap;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.filter-group label {
+  font-weight: bold;
+  color: #495057;
+  font-size: 14px;
+}
+
+.filter-group input[type="date"] {
+  padding: 10px 15px;
+  border: 1px solid #ced4da;
+  border-radius: 5px;
+  font-size: 14px;
+  min-width: 160px;
+}
+
+.filter-group input[type="date"]:focus {
+  outline: none;
+  border-color: #0d5d83;
+  box-shadow: 0 0 5px rgba(13, 93, 131, 0.2);
+}
+
+.btn-filter, .btn-reset {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  font-weight: bold;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  font-size: 14px;
+}
+
+.btn-filter {
+  background: #0d5d83;
+  color: white;
+}
+
+.btn-filter:hover {
+  background: #094564;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(13, 93, 131, 0.3);
+}
+
+.btn-reset {
+  background: #6c757d;
+  color: white;
+}
+
+.btn-reset:hover {
+  background: #545b62;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(108, 117, 125, 0.3);
+}
+
+/* ===== Report Section ===== */
+.report-section {
+  background: white;
+  padding: 25px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 30px;
+}
+
+.report-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #e9ecef;
+}
+
+.report-header h3 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  color: #0d5d83;
+  font-size: 20px;
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.report-header h3 i {
+  font-size: 24px;
+}
+
+.btn-download {
+  background: linear-gradient(135deg, #28a745, #20c997);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+  box-shadow: 0 3px 6px rgba(40, 167, 69, 0.3);
+  font-size: 14px;
+}
+
+.btn-download:hover {
+  background: linear-gradient(135deg, #20c997, #28a745);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 12px rgba(40, 167, 69, 0.4);
+}
+
+.btn-download:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(40, 167, 69, 0.3);
+}
+
+/* ===== Table Wrapper ===== */
+.table-wrapper {
+  overflow-x: auto;
+  border-radius: 8px;
+}
+
+/* ===== Empty State ===== */
+.fa-inbox {
+  display: block;
+  color: #adb5bd;
+}
+
+/* ===== Responsive Design ===== */
+@media (max-width: 768px) {
+  .date-filters {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .filter-group input[type="date"] {
+    width: 100%;
+  }
+  
+  .btn-filter, .btn-reset {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .report-header {
+    flex-direction: column;
+    gap: 15px;
+    align-items: flex-start;
+  }
+  
+  .btn-download {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .container {
+    margin: 20px 10px;
+    padding: 15px;
+  }
 }
