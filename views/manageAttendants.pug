@@ -22,12 +22,20 @@ html(lang='en')
       // Add New Attendant Form
       .login-box
         h2 ADD NEW ATTENDANT
-        form(action='/dashboard/create-attendant' method='post')
+        form#addAttendantForm(action='/dashboard/create-attendant' method='post' novalidate)
           .form-grid
-            input(type='text' name='fullName' placeholder='Full Name' required)
-            input(type='email' name='email' placeholder='Email Address' required)
-            .full-width
-              input(type='password' name='password' placeholder='Password (min 6 characters)' required minlength='6')
+            .form-field
+              input#fullName(type='text' name='fullName' placeholder='Full Name' required)
+              span.error-message Please enter full name
+            
+            .form-field
+              input#email(type='email' name='email' placeholder='Email Address' required)
+              span.error-message Please enter a valid email
+            
+            .full-width.form-field
+              input#password(type='password' name='password' placeholder='Password (min 6 characters)' required minlength='6')
+              span.error-message Password must be at least 6 characters
+          
           button(type='submit') Create Attendant
       
       // Current Attendants List
@@ -44,12 +52,187 @@ html(lang='en')
                 th ACTIONS
             tbody
               each attendant in attendants
-                tr
-                  td #{attendant.fullName || 'N/A'}
-                  td #{attendant.email}
+                tr(data-id=attendant._id)
+                  td.editable-name(data-field='fullName') #{attendant.fullName || 'N/A'}
+                  td.editable-email(data-field='email') #{attendant.email}
                   td #{attendant.createdAt ? attendant.createdAt.toLocaleDateString() : 'N/A'}
-                  td
+                  td.action-buttons
+                    button.btn-edit(onclick=`editAttendant('${attendant._id}', '${attendant.fullName}', '${attendant.email}')`) Edit
                     form(action=`/dashboard/delete-attendant/${attendant._id}` method='post' style='display: inline;' onsubmit='return confirm("Are you sure you want to delete this attendant?");')
                       button.btn-danger(type='submit') Delete
         else
           .no-attendants No attendants found. Create your first attendant above.
+    
+    // Edit Modal
+    #editModal.modal
+      .modal-content
+        .modal-header
+          h2 EDIT ATTENDANT
+          span.close(onclick='closeEditModal()') ×
+        
+        form#editAttendantForm(action='' method='post' novalidate)
+          input(type='hidden' name='_method' value='PUT')
+          
+          .form-field
+            label(for='editFullName') Full Name
+            input#editFullName(type='text' name='fullName' required)
+            span.error-message Please enter full name
+          
+          .form-field
+            label(for='editEmail') Email
+            input#editEmail(type='email' name='email' required)
+            span.error-message Please enter a valid email
+          
+          .form-field
+            label(for='editPassword') New Password (leave blank to keep current)
+            input#editPassword(type='password' name='password' minlength='6' placeholder='Optional')
+            span.error-message Password must be at least 6 characters
+          
+          .modal-actions
+            button.btn-secondary(type='button' onclick='closeEditModal()') Cancel
+            button.btn-primary(type='submit') Save Changes
+
+    script.
+      // Form validation for Add Attendant
+      document.getElementById('addAttendantForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        let isValid = true;
+        const form = this;
+        
+        // Get all required inputs
+        const fullName = form.querySelector('#fullName');
+        const email = form.querySelector('#email');
+        const password = form.querySelector('#password');
+        
+        // Validate Full Name
+        if (!fullName.value.trim()) {
+          showError(fullName);
+          isValid = false;
+        } else {
+          removeError(fullName);
+        }
+        
+        // Validate Email
+        if (!email.value.trim() || !isValidEmail(email.value)) {
+          showError(email);
+          isValid = false;
+        } else {
+          removeError(email);
+        }
+        
+        // Validate Password
+        if (!password.value || password.value.length < 6) {
+          showError(password);
+          isValid = false;
+        } else {
+          removeError(password);
+        }
+        
+        if (isValid) {
+          form.submit();
+        }
+      });
+      
+      // Form validation for Edit Attendant
+      document.getElementById('editAttendantForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        let isValid = true;
+        const form = this;
+        
+        const fullName = form.querySelector('#editFullName');
+        const email = form.querySelector('#editEmail');
+        const password = form.querySelector('#editPassword');
+        
+        // Validate Full Name
+        if (!fullName.value.trim()) {
+          showError(fullName);
+          isValid = false;
+        } else {
+          removeError(fullName);
+        }
+        
+        // Validate Email
+        if (!email.value.trim() || !isValidEmail(email.value)) {
+          showError(email);
+          isValid = false;
+        } else {
+          removeError(email);
+        }
+        
+        // Validate Password (only if filled)
+        if (password.value && password.value.length < 6) {
+          showError(password);
+          isValid = false;
+        } else {
+          removeError(password);
+        }
+        
+        if (isValid) {
+          form.submit();
+        }
+      });
+      
+      // Helper functions
+      function showError(input) {
+        const formField = input.closest('.form-field');
+        formField.classList.add('has-error');
+        input.classList.add('input-error');
+      }
+      
+      function removeError(input) {
+        const formField = input.closest('.form-field');
+        formField.classList.remove('has-error');
+        input.classList.remove('input-error');
+      }
+      
+      function isValidEmail(email) {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+      }
+      
+      // Edit Modal Functions
+      function editAttendant(id, fullName, email) {
+        const modal = document.getElementById('editModal');
+        const form = document.getElementById('editAttendantForm');
+        
+        // Set form action
+        form.action = `/dashboard/update-attendant/${id}`;
+        
+        // Fill form fields
+        document.getElementById('editFullName').value = fullName;
+        document.getElementById('editEmail').value = email;
+        document.getElementById('editPassword').value = '';
+        
+        // Show modal
+        modal.style.display = 'block';
+      }
+      
+      function closeEditModal() {
+        const modal = document.getElementById('editModal');
+        modal.style.display = 'none';
+        
+        // Clear form
+        document.getElementById('editAttendantForm').reset();
+        
+        // Remove any error states
+        document.querySelectorAll('.has-error').forEach(el => el.classList.remove('has-error'));
+        document.querySelectorAll('.input-error').forEach(el => el.classList.remove('input-error'));
+      }
+      
+      // Close modal when clicking outside
+      window.onclick = function(event) {
+        const modal = document.getElementById('editModal');
+        if (event.target === modal) {
+          closeEditModal();
+        }
+      }
+      
+      // Remove error on input
+      document.querySelectorAll('input').forEach(input => {
+        input.addEventListener('input', function() {
+          if (this.value.trim()) {
+            removeError(this);
+          }
+        });
+      });

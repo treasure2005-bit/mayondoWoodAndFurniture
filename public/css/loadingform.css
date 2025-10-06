@@ -115,6 +115,7 @@
     background: #545b62;
   }
 
+  
   /* Centered card container */
 .loading-card {
   max-width: 800px;
@@ -217,3 +218,4 @@ body {
   gap: 1rem;
   margin-top: 1.5rem;
 }
+

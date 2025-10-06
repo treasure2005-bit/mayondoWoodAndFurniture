@@ -4,43 +4,215 @@ html
     meta(charset='UTF-8')
     meta(name='viewport' content='width=device-width, initial-scale=1.0')
     title Stock Report
-    link(rel='stylesheet', href='/css/stockreport.css')
-    link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css')
-  body.image
+    link(rel='stylesheet' href='/css/stockreport.css')
+    link(href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css' rel='stylesheet')
+  body
     nav.navbar
-      .nav-brand
-      .nav-links
-        a.logout(href='/login')
-          i.fas.fa-sign-out-alt
-          |  Logout
+      a(href='/attendant')
+        i.fas.fa-home
+        |  Dashboard
+      a(href='/login')
+        i.fas.fa-sign-out-alt
+        |  Logout
 
     .container
-      h2 STOCK REPORT
-      table
-        thead
-          tr
-            th Product Name
-            th Product Type
-            th Product Price
-            th Cost Price
-            th Quantity
-            th Supplier Name
-            th Date
-            th Quality
-            th Color
-            th Measurements
-            th Status
-        tbody
-          each item in stock
-            tr
-              td= item.productName
-              td= item.productType
-              td= item.productPrice
-              td= item.costPrice
-              td= item.quantity
-              td= item.supplierName
-              td= item.date.toDateString()
-              td= item.quality
-              td= item.color || '-'
-              td= item.measurement || '-'
-              td= item.status || 'pending'
+      .date-filters
+        .filter-group
+          label(for='dateFrom') From:
+          input#dateFrom(type='date' name='dateFrom')
+        .filter-group
+          label(for='dateTo') To:
+          input#dateTo(type='date' name='dateTo')
+        .filter-group
+          label(for='productFilter') Product Name:
+          select#productFilter
+            option(value='') All Products
+            option(value='timber') Timber
+            option(value='poles') Poles
+            option(value='hardwood') Hardwood
+            option(value='softwood') Softwood
+        .filter-group
+          label(for='qualityFilter') Quality:
+          select#qualityFilter
+            option(value='') All Qualities
+            option(value='premium') Good
+            option(value='standard') Medium
+            option(value='economy') Bad
+        .filter-group
+          label(for='supplierFilter') Supplier:
+          select#supplierFilter
+            option(value='') All Suppliers
+            if stocks && stocks.length > 0
+              each supplier in [...new Set(stocks.map(s => s.supplierName))]
+                option(value=supplier)= supplier
+      
+      .filter-buttons
+        button.btn-filter(onclick='applyFilters()')
+          i.fas.fa-search
+          |  SEARCH
+        button.btn-reset(onclick='resetFilters()')
+          i.fas.fa-redo
+          |  RESET
+        button.btn-pdf(onclick='downloadPDF()')
+          i.fas.fa-file-pdf
+          |  Download PDF
+
+      .summary-section
+        .summary-card
+          h4 Total Items
+          .value#totalItems 0
+        .summary-card
+          h4 Total Quantity
+          .value#totalQuantity 0
+        .summary-card
+          h4 Total Value
+          .value#totalValue UGX 0
+        .summary-card
+          h4 Total Cost
+          .value#totalCost UGX 0
+
+      .report-section
+        .report-header
+          h3
+            i.fas.fa-list-alt
+            |  STOCK REPORT
+          button.btn-download(onclick='downloadExcel()')
+            i.fas.fa-download
+            |  DOWNLOAD
+
+        .table-wrapper
+          if stocks && stocks.length > 0
+            table
+              thead
+                tr
+                  th NO.
+                  th Recorded By
+                  th Attendant ID
+                  th Date
+                  th Product Name
+                  th Type
+                  th Supplier
+                  th Quality
+                  th Quantity
+                  th Measurements
+                  th Cost Price
+                  th Selling Price
+                  th Total Value
+              tbody#stockTableBody
+                each stock, index in stocks
+                  tr(data-date=stock.date data-product=stock.productName data-quality=stock.quality data-supplier=stock.supplierName data-quantity=stock.quantity data-cost=stock.costPrice data-price=stock.productPrice)
+                    td= index + 1
+                    td= stock.recordedBy || 'N/A'
+                    td= stock.attendantId ? stock.attendantId.toString().slice(-6) : 'N/A'
+                    td= new Date(stock.date).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' })
+                    td= stock.productName
+                    td= stock.productType
+                    td= stock.supplierName
+                    td= stock.quality
+                    td= stock.quantity
+                    td= stock.measurements || '-'
+                    td UGX #{stock.costPrice.toLocaleString()}
+                    td UGX #{stock.productPrice.toLocaleString()}
+                    td UGX #{(stock.productPrice * stock.quantity).toLocaleString()}
+          else
+            .no-data
+              i.fas.fa-inbox
+              p No stock records found
+
+    script.
+      document.addEventListener('DOMContentLoaded', function() {
+        calculateSummary();
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('dateTo').value = today;
+      });
+
+      function calculateSummary() {
+        const rows = document.querySelectorAll('#stockTableBody tr:not([style*="display: none"])');
+        let totalItems = rows.length;
+        let totalQuantity = 0;
+        let totalValue = 0;
+        let totalCost = 0;
+
+        rows.forEach(row => {
+          const quantity = parseInt(row.dataset.quantity) || 0;
+          const costPrice = parseInt(row.dataset.cost) || 0;
+          const sellingPrice = parseInt(row.dataset.price) || 0;
+          
+          totalQuantity += quantity;
+          totalCost += costPrice * quantity;
+          totalValue += sellingPrice * quantity;
+        });
+
+        document.getElementById('totalItems').textContent = totalItems;
+        document.getElementById('totalQuantity').textContent = totalQuantity.toLocaleString();
+        document.getElementById('totalValue').textContent = 'UGX ' + totalValue.toLocaleString();
+        document.getElementById('totalCost').textContent = 'UGX ' + totalCost.toLocaleString();
+      }
+
+      function applyFilters() {
+        const dateFrom = document.getElementById('dateFrom').value;
+        const dateTo = document.getElementById('dateTo').value;
+        const product = document.getElementById('productFilter').value.toLowerCase();
+        const quality = document.getElementById('qualityFilter').value.toLowerCase();
+        const supplier = document.getElementById('supplierFilter').value.toLowerCase();
+
+        const rows = document.querySelectorAll('#stockTableBody tr');
+        
+        rows.forEach(row => {
+          const rowDate = new Date(row.dataset.date);
+          const rowProduct = row.dataset.product.toLowerCase();
+          const rowQuality = row.dataset.quality.toLowerCase();
+          const rowSupplier = row.dataset.supplier.toLowerCase();
+
+          let showRow = true;
+
+          if (dateFrom && rowDate < new Date(dateFrom)) showRow = false;
+          if (dateTo && rowDate > new Date(dateTo)) showRow = false;
+          if (product && rowProduct !== product) showRow = false;
+          if (quality && rowQuality !== quality) showRow = false;
+          if (supplier && rowSupplier !== supplier) showRow = false;
+
+          row.style.display = showRow ? '' : 'none';
+        });
+
+        calculateSummary();
+      }
+
+      function resetFilters() {
+        document.getElementById('dateFrom').value = '';
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('dateTo').value = today;
+        document.getElementById('productFilter').value = '';
+        document.getElementById('qualityFilter').value = '';
+        document.getElementById('supplierFilter').value = '';
+
+        const rows = document.querySelectorAll('#stockTableBody tr');
+        rows.forEach(row => row.style.display = '');
+        
+        calculateSummary();
+      }
+
+      function downloadExcel() {
+        const rows = document.querySelectorAll('#stockTableBody tr:not([style*="display: none"])');
+        let csv = '#,Recorded By,Attendant ID,Date,Product Name,Type,Supplier,Quality,Quantity,Measurements,Cost Price,Selling Price,Total Value\n';
+        
+        rows.forEach(row => {
+          const cells = row.cells;
+          const rowData = [];
+          for (let i = 0; i < cells.length; i++) {
+            rowData.push('"' + cells[i].textContent.trim() + '"');
+          }
+          csv += rowData.join(',') + '\n';
+        });
+
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `stock_report_${new Date().toISOString().split('T')[0]}.csv`;
+        a.click();
+      }
+
+      function downloadPDF() {
+        window.print();
+      }

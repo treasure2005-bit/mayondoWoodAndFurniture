@@ -25,6 +25,7 @@ const userRoutes = require("./routes/userRoutes");
 const attendantstockRoutes = require("./routes/attendantstockRoutes");
 const reportsRoutes = require("./routes/reportsRoutes")
 const suppliersRoutes = require("./routes/suppliersRoutes");
+const stockreportRoutes = require("./routes/stockreportRoutes");
 
 
 // 2 . Instantiations
@@ -89,7 +90,7 @@ app.use("/userRoutes", userRoutes);
 app.use("/", attendantstockRoutes);
 app.use("/", reportsRoutes);
 app.use("/", suppliersRoutes);
-
+app.use("/", stockreportRoutes);
 
 
 //non existent route handler Second last

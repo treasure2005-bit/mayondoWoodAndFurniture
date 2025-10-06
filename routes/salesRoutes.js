@@ -2,9 +2,9 @@ const express = require("express");
 const router = express.Router();
 const salesModel = require("../models/salesModel");
 
-// Middleware to check authentication - FIXED VERSION
+// FIXED Authentication middleware - uses session instead of Passport
 const isAuthenticated = (req, res, next) => {
-  if (req.isAuthenticated()) {
+  if (req.session.user) {
     return next();
   }
   res.redirect("/login");
@@ -15,14 +15,14 @@ router.get("/salesTable", isAuthenticated, async (req, res) => {
   try {
     const sales = await salesModel
       .find()
-      .populate("salesAgent", "username email")
+      .populate("salesAgent", "fullName email")
       .sort({ _id: -1 });
 
     res.render("salesTable", {
       title: "Sales Records",
       sales: sales,
-      user: req.user,
-      userRole: req.user.role, // Pass role to template
+      user: req.session.user,
+      userRole: req.session.user.role,
     });
   } catch (error) {
     console.error("Error fetching sales:", error);
@@ -35,7 +35,7 @@ router.get("/recordingSales", isAuthenticated, async (req, res) => {
   try {
     res.render("recordingSales", {
       title: "Record Sale",
-      user: req.user,
+      user: req.session.user,
     });
   } catch (error) {
     console.error("Error loading recording sales page:", error);
@@ -54,7 +54,7 @@ router.post("/recordingSales", isAuthenticated, async (req, res) => {
       unitPrice: req.body.unitPrice,
       date: req.body.date,
       paymentType: req.body.paymentType,
-      salesAgent: req.user._id,
+      salesAgent: req.session.user._id,
       checkBox: req.body.checkBox || "",
     });
 
@@ -67,18 +67,17 @@ router.post("/recordingSales", isAuthenticated, async (req, res) => {
 });
 
 // Edit sale - Only for Managers
-router.get("/sales/edit/:id", isAuthenticated, async (req, res) => {
-  // Check if user is Manager
-  if (req.user.role !== "Manager") {
+router.get("/editSales/:id", isAuthenticated, async (req, res) => {
+  if (req.session.user.role !== "Manager") {
     return res.status(403).send("Access denied. Managers only.");
   }
 
   try {
     const sale = await salesModel.findById(req.params.id);
-    res.render("editSale", {
+    res.render("editSales", {
       title: "Edit Sale",
       sale: sale,
-      user: req.user,
+      user: req.session.user,
     });
   } catch (error) {
     console.error("Error loading sale:", error);
@@ -87,9 +86,8 @@ router.get("/sales/edit/:id", isAuthenticated, async (req, res) => {
 });
 
 // Update sale - Only for Managers
-router.post("/sales/edit/:id", isAuthenticated, async (req, res) => {
-  // Check if user is Manager
-  if (req.user.role !== "Manager") {
+router.post("/editSales/:id", isAuthenticated, async (req, res) => {
+  if (req.session.user.role !== "Manager") {
     return res.status(403).send("Access denied. Managers only.");
   }
 
@@ -104,8 +102,7 @@ router.post("/sales/edit/:id", isAuthenticated, async (req, res) => {
 
 // Delete sale - Only for Managers
 router.post("/sales/delete/:id", isAuthenticated, async (req, res) => {
-  // Check if user is Manager
-  if (req.user.role !== "Manager") {
+  if (req.session.user.role !== "Manager") {
     return res.status(403).send("Access denied. Managers only.");
   }
 
@@ -123,7 +120,7 @@ router.get("/getReceipt/:id", isAuthenticated, async (req, res) => {
   try {
     const sale = await salesModel
       .findById(req.params.id)
-      .populate("salesAgent", "username email");
+      .populate("salesAgent", "fullName email");
 
     if (!sale) {
       return res.status(404).send("Receipt not found");
@@ -131,14 +128,13 @@ router.get("/getReceipt/:id", isAuthenticated, async (req, res) => {
 
     res.render("receipt", {
       title: "Receipt",
-      sale: sale,       // 👈 pass sale to Pug
-      user: req.user,
+      sale: sale,
+      user: req.session.user,
     });
   } catch (error) {
     console.error("Error loading receipt:", error);
     res.status(500).send("Error loading receipt");
   }
 });
-
 
 module.exports = router;

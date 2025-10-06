@@ -1,37 +1,51 @@
 const express = require("express");
 const router = express.Router();
-// const passport = require("passport");
 const moment = require("moment");
-
-// const Supplier = require("../models/suppliersModel"); 
 const suppliersModel = require("../models/suppliersModel");
 
+// Authentication middleware
+const isAuthenticated = (req, res, next) => {
+  if (req.session.user) {
+    return next();
+  }
+  res.redirect("/login");
+};
+
 // GET suppliers page
-router.get("/suppliers", async (req, res) => {
+router.get("/suppliers", isAuthenticated, async (req, res) => {
   try {
     const suppliers = await suppliersModel.find().sort({ createdAt: -1 });
     console.log("Number of suppliers found:", suppliers.length);
-    res.render("suppliers", { suppliers: suppliers });
+    res.render("suppliers", {
+      suppliers: suppliers,
+      user: req.session.user,
+    });
   } catch (error) {
     console.error("Error fetching suppliers:", error);
-    res.render("suppliers", { suppliers: [] });
+    res.render("suppliers", {
+      suppliers: [],
+      user: req.session.user,
+    });
   }
 });
 
-//GET SUPPLIERS TABLE
-router.get("/suppliersTable", async (_req, res) => {
+// GET SUPPLIERS TABLE
+router.get("/suppliersTable", isAuthenticated, async (req, res) => {
   try {
     const suppliers = await suppliersModel.find().sort({ $natural: -1 });
-    res.render("suppliersTable", { suppliers, moment });
+    res.render("suppliersTable", {
+      suppliers,
+      moment,
+      user: req.session.user,
+    });
   } catch (error) {
     console.error("Error fetching stock:", error);
     res.status(500).send("Unable to get data from the database");
   }
 });
 
-
 // POST add new supplier
-router.post("/suppliers/add", async (req, res) => {
+router.post("/suppliers/add", isAuthenticated, async (req, res) => {
   try {
     console.log("Received form data:", req.body);
 
@@ -53,22 +67,24 @@ router.post("/suppliers/add", async (req, res) => {
   }
 });
 
-
 // edit supplier
-router.get("/editSupplier/:id", async (req, res) => {
+router.get("/editSupplier/:id", isAuthenticated, async (req, res) => {
   try {
     const supplier = await suppliersModel.findById(req.params.id);
     if (!supplier) {
       return res.status(404).send("supplier not found");
     }
-    res.render("editSuppliers", { supplier });
+    res.render("editSuppliers", {
+      supplier,
+      user: req.session.user,
+    });
   } catch (error) {
     console.error("Error fetching supplier for edit:", error);
     res.status(500).send("Error loading edit form");
   }
 });
 
-router.post("/editSupplier/:id", async (req, res) => {
+router.post("/editSupplier/:id", isAuthenticated, async (req, res) => {
   try {
     const updatedSupplier = await suppliersModel.findByIdAndUpdate(
       req.params.id,
@@ -94,9 +110,11 @@ router.post("/editSupplier/:id", async (req, res) => {
   }
 });
 
-router.post("/deleteSupplier/:id", async (req, res) => {
+router.post("/deleteSupplier/:id", isAuthenticated, async (req, res) => {
   try {
-    const deletedSupplier = await suppliersModel.findByIdAndDelete(req.params.id);
+    const deletedSupplier = await suppliersModel.findByIdAndDelete(
+      req.params.id
+    );
     if (!deletedSupplier) {
       return res.status(404).send("Supplier not found");
     }
@@ -106,13 +124,5 @@ router.post("/deleteSupplier/:id", async (req, res) => {
     res.status(500).send("Error deleting supplier");
   }
 });
-
-
-
-
-
-
-
-
 
 module.exports = router;

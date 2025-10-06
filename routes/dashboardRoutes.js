@@ -273,6 +273,77 @@ router.post("/create-attendant", async (req, res) => {
   }
 });
 
+
+
+// Update attendant
+router.post("/update-attendant/:id", async (req, res) => {
+  try {
+    // Check if user is manager
+    if (!req.session.user || req.session.user.role !== "Manager") {
+      return res.redirect("/login");
+    }
+
+    const { fullName, email, password } = req.body;
+    const attendantId = req.params.id;
+
+    // Validate input
+    if (!email || !fullName) {
+      return res.redirect(
+        "/dashboard/attendants?error=Full name and email are required"
+      );
+    }
+
+    // Check if email is already used by another user
+    const existingUser = await userModel.findOne({ 
+      email: email,
+      _id: { $ne: attendantId } // Exclude current user
+    });
+    
+    if (existingUser) {
+      return res.redirect(
+        "/dashboard/attendants?error=Email already in use by another user"
+      );
+    }
+
+    // Find the attendant
+    const attendant = await userModel.findById(attendantId);
+    
+    if (!attendant) {
+      return res.redirect(
+        "/dashboard/attendants?error=Attendant not found"
+      );
+    }
+
+    // Update basic info
+    attendant.fullName = fullName;
+    attendant.email = email;
+
+    // If password is provided, update it
+    if (password && password.trim() !== '') {
+      if (password.length < 6) {
+        return res.redirect(
+          "/dashboard/attendants?error=Password must be at least 6 characters"
+        );
+      }
+      
+      // Use passport-local-mongoose's setPassword method
+      await attendant.setPassword(password);
+    }
+
+    // Save the updated attendant
+    await attendant.save();
+
+    res.redirect(
+      "/dashboard/attendants?success=Attendant updated successfully"
+    );
+  } catch (error) {
+    console.error("Error updating attendant:", error);
+    res.redirect("/dashboard/attendants?error=Error updating attendant");
+  }
+});
+
+
+
 // Delete attendant
 router.post("/delete-attendant/:id", async (req, res) => {
   try {

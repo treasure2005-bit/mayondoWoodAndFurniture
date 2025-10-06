@@ -4,6 +4,7 @@
   padding: 0;
   box-sizing: border-box;
 }
+
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background-image: url("/images/landingpage.jpg");
@@ -15,7 +16,6 @@ body {
   color: #333;
 }
 
-
 /* Top Bar */
 .top-bar {
   display: flex;
@@ -23,7 +23,6 @@ body {
   align-items: center;
   background: #d6d6d6;
   padding: 15px 30px;
-  
 }
 
 .top-bar a {
@@ -47,63 +46,79 @@ body {
 .container {
   width: 95%;
   max-width: 1400px;
-  margin: 30px auto;
+  margin: 40px auto;
+  padding: 30px;
+  background: rgba(140, 198, 221, 0.95);
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
 }
 
-/* Title + Add Button */
+/* Page Header */
 .page-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 25px;
 }
 
+.container h2,
 .page-header h1 {
-  font-size: 1.5rem;
+  font-size: 1.8rem;
   font-weight: 700;
-  color: #333;
+  color: #10355e;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 1.5px;
+  margin: 0;
 }
 
-.add-sale-btn {
-  background:linear-gradient(135deg, #FFA500, #FFD700);
-  color: rgb(19, 16, 16);
+/* Add Sale Button */
+.add-sale-btn,
+.btn-add {
+  background: linear-gradient(135deg, #FFA500, #FFD700);
+  color: #000;
   font-weight: bold;
-  padding: 10px 20px;
+  padding: 12px 24px;
   border-radius: 6px;
   text-transform: uppercase;
   text-decoration: none;
-  transition: background 0.3s ease, transform 0.2s ease;
+  font-size: 0.9rem;
+  letter-spacing: 0.5px;
+  transition: all 0.3s ease;
+  display: inline-block;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
-.add-sale-btn:hover {
-  background: #43a047;
+.add-sale-btn:hover,
+.btn-add:hover {
+  background: linear-gradient(135deg, #FF8C00, #FFC700);
   transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
-/* Sales Table */
+/* Table */
 table {
   width: 100%;
   border-collapse: collapse;
   background: white;
-  border-radius: 12px;
+  border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  font-size: 0.9rem;
 }
 
 thead {
-  background: #3c83cf;
+  background: #10355e;
   color: white;
 }
 
 thead th {
-  padding: 14px;
+  padding: 14px 12px;
   text-align: left;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 tbody tr {
@@ -111,23 +126,27 @@ tbody tr {
   transition: background 0.2s ease;
 }
 
+tbody tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
 tbody tr:hover {
-  background: #f8f9fa;
+  background: #eef6ff;
 }
 
 tbody td {
-  padding: 14px;
-  font-size: 0.9rem;
+  padding: 12px;
+  font-size: 0.85rem;
   vertical-align: middle;
-  white-space: nowrap;
+  border: 1px solid #e8e8e8;
 }
 
-/* Buttons */
+/* Action Buttons */
 .btn {
   padding: 6px 14px;
   border: none;
   border-radius: 6px;
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   font-weight: 700;
   cursor: pointer;
   text-transform: uppercase;
@@ -135,15 +154,16 @@ tbody td {
   transition: all 0.3s ease;
   margin: 2px;
   display: inline-block;
+  letter-spacing: 0.5px;
 }
 
 .btn-receipt {
-  background: #ffcc00;
-  color: #333;
+  background: #c067a5;
+  color: white;
 }
 
 .btn-receipt:hover {
-  background: #e6b800;
+  background: #a5548a;
   transform: translateY(-2px);
 }
 
@@ -167,95 +187,78 @@ tbody td {
   transform: translateY(-2px);
 }
 
+/* Responsive Design */
+@media screen and (max-width: 1200px) {
+  .container {
+    width: 98%;
+    padding: 20px;
+    margin: 20px auto;
+  }
+  
+  table {
+    font-size: 0.8rem;
+  }
+  
+  tbody td {
+    padding: 10px 8px;
+  }
+  
+  .btn {
+    padding: 5px 10px;
+    font-size: 0.65rem;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .top-bar {
+    flex-direction: column;
+    gap: 10px;
+    padding: 15px;
+  }
+  
+  .page-header {
+    flex-direction: column;
+    gap: 15px;
+    align-items: flex-start;
+  }
+  
+  .container h2,
+  .page-header h1 {
+    font-size: 1.3rem;
+  }
+  
+  table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+}
+
 /* Print Optimization */
 @media print {
   body {
     background: white;
   }
-  .top-bar, .add-sale-btn, .btn {
+  
+  .top-bar,
+  .add-sale-btn,
+  .btn-add,
+  .btn {
     display: none !important;
   }
+  
+  .container {
+    box-shadow: none;
+    background: white;
+    margin: 0;
+    padding: 20px;
+  }
+  
   table {
     box-shadow: none;
   }
-}
-/* Container */
-.container {
-  max-width: 1200px;
-  margin: 100px auto 40px;
-  padding: 20px;
-  background: #8cc6dd;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-}
-
-/* Page Title */
-.container h2 {
-  font-size: 22px;
-  text-align: center;
-  margin-bottom: 20px;
-  text-transform: uppercase;
-  font-weight: bold;
-  color: #10355e;
-}
-
-/* Table */
-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 14px;
-  background: #fff;
-  border-radius: 8px;
-  overflow: hidden;
-}
-
-table th,
-table td {
-  border: 1px solid #ddd;
-  padding: 10px;
-  text-align: left;
-}
-
-table th {
-  background: #10355e;   
-  color: #fff;
-  font-weight: bold;
-}
-
-table tbody tr:nth-child(even) {
-  background-color: #f9f9f9;
-}
-
-table tbody tr:hover {
-  background-color: #eef6ff;
-  transition: 0.3s;
-}
-
-/* Buttons */
-.btn-add {
-  background: #28a745;
-  color: #fff;
-  padding: 8px 16px;
-  border-radius: 6px;
-  font-size: 14px;
-  font-weight: bold;
-  text-decoration: none;
-}
-
-.btn-add:hover {
-  background: #218838;
-}
-
-.btn-receipt {
-  background: #c067a5;
-  color: #000;
-  padding: 6px 12px;
-  border-radius: 6px;
-  font-size: 13px;
-  font-weight: bold;
-  text-decoration: none;
-}
-
-.btn-receipt:hover {
-  background: #e0a800;
+  
+  tbody tr:hover {
+    background: inherit;
+  }
 }

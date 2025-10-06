@@ -11,7 +11,7 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  color: #fff;
+  color: #030202;
   text-decoration: none;
   font-weight: 500;
   margin-bottom: 20px;
@@ -60,8 +60,61 @@ body {
   grid-column: 1 / -1;
 }
 
+/* Form Field Wrapper for Validation */
+.form-field {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.form-field label {
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: #333;
+}
+
+.form-field input {
+  padding: 12px;
+  border: 2px solid #ddd;
+  border-radius: 5px;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.form-field input:focus {
+  outline: none;
+  border-color: #4CAF50;
+}
+
+/* Error State Styles */
+.form-field.has-error input,
+.input-error {
+  border-color: #f44336 !important;
+  background-color: #ffebee;
+  animation: shake 0.3s;
+}
+
+.form-field .error-message {
+  display: none;
+  color: #f44336;
+  font-size: 12px;
+  margin-top: 5px;
+  font-weight: 500;
+}
+
+.form-field.has-error .error-message {
+  display: block;
+}
+
+/* Shake Animation */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-10px); }
+  75% { transform: translateX(10px); }
+}
+
 .attendants-section {
-  background: rgba(255, 255, 255, 0.95);
+  background: rgba(130, 223, 247, 0.95);
   padding: 30px;
   border-radius: 10px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -77,7 +130,7 @@ body {
   width: 100%;
   border-collapse: collapse;
   margin-top: 20px;
-  background: white;
+  background: rgb(255, 255, 255);
 }
 
 .attendants-table th,
@@ -97,6 +150,30 @@ body {
   background: #f8f9fa;
 }
 
+/* Action Buttons Container */
+.action-buttons {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+/* Edit Button */
+.btn-edit {
+  background: #2196F3;
+  color: white;
+  padding: 8px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background 0.3s ease;
+}
+
+.btn-edit:hover {
+  background: #0b7dda;
+}
+
+/* Delete Button */
 .btn-danger {
   background: #f44336;
   color: white;
@@ -112,6 +189,118 @@ body {
   background: #da190b;
 }
 
+/* Modal Styles */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  animation: fadeIn 0.3s;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.modal-content {
+  background-color: #fefefe;
+  margin: 5% auto;
+  padding: 0;
+  border-radius: 10px;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  animation: slideDown 0.3s;
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 30px;
+  background: rgba(130, 223, 247, 0.95);
+  border-radius: 10px 10px 0 0;
+}
+
+.modal-header h2 {
+  margin: 0;
+  color: #333;
+}
+
+.close {
+  color: #333;
+  font-size: 35px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: color 0.3s;
+  line-height: 1;
+}
+
+.close:hover {
+  color: #f44336;
+}
+
+#editAttendantForm {
+  padding: 30px;
+}
+
+#editAttendantForm .form-field {
+  margin-bottom: 20px;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 25px;
+}
+
+.btn-primary,
+.btn-secondary {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.btn-primary {
+  background: #4CAF50;
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #45a049;
+}
+
+.btn-secondary {
+  background: #757575;
+  color: white;
+}
+
+.btn-secondary:hover {
+  background: #616161;
+}
+
+/* Alert Messages */
 .alert {
   padding: 15px 20px;
   border-radius: 8px;
@@ -137,4 +326,26 @@ body {
   color: #666;
   padding: 40px;
   font-size: 16px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .action-buttons {
+    flex-direction: column;
+    gap: 5px;
+  }
+  
+  .btn-edit,
+  .btn-danger {
+    width: 100%;
+  }
+  
+  .modal-content {
+    width: 95%;
+    margin: 10% auto;
+  }
 }

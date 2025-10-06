@@ -1,73 +1,384 @@
 doctype html
-html
-  head
-    meta(charset='UTF-8')
-    meta(name='viewport' content='width=device-width, initial-scale=1.0')
-    title MWF - MANAGER STOCK REGISTRATION
-    link(rel='stylesheet' href='/css/style.css')
-    link(rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css')
-  bodybody
-    .navbar
-      a(href='/dashboard')
-        i.fas.fa-home
-        |  Dashboard
-      a(href='/login')
-        i.fas.fa-sign-out-alt
-        span LOGOUT
-    .container 
-      h2(style='margin-right:700px') MANAGER STOCK REGISTRATION
-      form(action="/registerStock",method="post")
-        fieldset
-          legend Manager Information
-          label(for='managerName') Manager Name:
-          input#managerName(type='text' placeholder='Enter manager name' required name='managerName')
-          label(for='managerId') Manager ID:
-          input#managerId(type='text' placeholder='Enter manager ID' required name='managerId')
-          label(for='date') Date of Registration:
-          input#date(type='date' required name='date')
-        fieldset
-          legend Product Information
-          label(for='productName') Product Name:
-          select#productName(name='productName' required)
-            option(value='') Select Product Name
-            option(value='beds') Beds
-            option(value='sofa') Sofa
-            option(value='dining tables') Dining Tables
-            option(value='cupboards') Cupboards
-            option(value='drawers') Drawers
-            option(value='timber') Timber 
-            option(value='poles') Poles 
-            option(value='hardwood') Hardwood
-            option(value='softwood') Softwood
-          label(for='productType') Product Type:
-          select#productType(name='productType' required)
-            option(value='') Select Product Type
-            option(value='home furniture') Home Furniture
-            option(value='office furniture') Office Furniture
-            option(value='wood') Wood
-          label(for='costPrice') Cost Price:
-          input#costPrice(type='number' step="1000" placeholder='Enter cost price' required name='costPrice')
-          label(for='productPrice') Product Price:
-          input#productPrice(type='number' step="1000" placeholder='Enter product price' required name='productPrice')
-          label(for='quantity') Quantity:
-          input#quantity(type='number' placeholder='Enter quantity' required name='quantity')
-          label(for='supplier') Supplier Name:
-          input#supplier(type='text' placeholder='Enter supplier name' required name='supplierName')
-          label(for='quality') Quality:
-          select#quality(name='quality' required)
-            option(value='') Select Quality 
-            option(value='good') Good
-            option(value='medium') Medium
-            option(value='bad') Bad
-          label(for='color') Color:
-          input#color(type='color' required name='color')
-          label(for='measurement') Measurement (e.g., size in cm):
-          input#measurement(type='text' placeholder='Enter measurement details' required name='measurement')
-        fieldset
-          legend Approval Status
-          label(for='status') Status:
-          select#status(name='status' required)
-            option(value='pending') Pending Approval
-            option(value='approved') Approved for Sale
-            option(value='rejected') Rejected
-        button(type='submit') Register Stock
+head
+  meta(charset='UTF-8')
+  meta(name='viewport' content='width=device-width, initial-scale=1.0')
+  title MWF - MANAGER STOCK REGISTRATION
+  link(rel='stylesheet' href='/css/style.css')
+  link(rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css')
+  style.
+    /* Enhanced Form Validation Styles */
+    .form-group {
+    position: relative;
+    margin-bottom: 20px;
+    }
+    .form-group input,
+    .form-group select {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: white;
+    }
+    .form-group input:focus,
+    .form-group select:focus {
+    outline: none;
+    border-color: #4caf50;
+    box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+    }
+    /* Invalid State - Shake Animation */
+    .form-group input.invalid,
+    .form-group select.invalid {
+    border-color: #e74c3c;
+    background: #fff5f5;
+    animation: shake 0.5s;
+    }
+    @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+    20%, 40%, 60%, 80% { transform: translateX(5px); }
+    }
+    /* Valid State - Checkmark */
+    .form-group input.valid,
+    .form-group select.valid {
+    border-color: #4caf50;
+    background: #f0fff4;
+    }
+    .form-group input.valid::after {
+    content: '✓';
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #4caf50;
+    font-weight: bold;
+    }
+    /* Error Message */
+    .error-message {
+    display: none;
+    color: #e74c3c;
+    font-size: 0.85rem;
+    margin-top: 5px;
+    font-weight: 500;
+    animation: slideDown 0.3s ease;
+    }
+    .error-message i {
+    margin-right: 5px;
+    }
+    .form-group.has-error .error-message {
+    display: flex;
+    align-items: center;
+    }
+    @keyframes slideDown {
+    from {
+    opacity: 0;
+    transform: translateY(-10px);
+    }
+    to {
+    opacity: 1;
+    transform: translateY(0);
+    }
+    }
+    /* Success Message */
+    .success-message {
+    display: none;
+    color: #4caf50;
+    font-size: 0.85rem;
+    margin-top: 5px;
+    font-weight: 500;
+    }
+    .success-message i {
+    margin-right: 5px;
+    }
+    .form-group.has-success .success-message {
+    display: flex;
+    align-items: center;
+    }
+    /* Required Field Indicator */
+    .form-group label::after {
+    content: ' *';
+    color: #e74c3c;
+    font-weight: bold;
+    }
+    /* Character Counter */
+    .char-counter {
+    font-size: 0.75rem;
+    color: #666;
+    text-align: right;
+    margin-top: 3px;
+    }
+    /* Submit Button States */
+    button[type="submit"] {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    }
+    button[type="submit"]:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    opacity: 0.6;
+    }
+    button[type="submit"].loading::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    animation: loading 1.5s infinite;
+    }
+    @keyframes loading {
+    to { left: 100%; }
+    }
+    /* Tooltip for hints */
+    .form-hint {
+    position: absolute;
+    right: -25px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: help;
+    color: #666;
+    }
+    .form-hint:hover::after {
+    content: attr(data-hint);
+    position: absolute;
+    right: 30px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: #333;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    white-space: nowrap;
+    z-index: 1000;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    }
+    /* Progress Bar */
+    .form-progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 0%;
+    height: 4px;
+    background: linear-gradient(90deg, #4caf50, #45a047);
+    transition: width 0.3s ease;
+    z-index: 9999;
+    }
+#formProgress.form-progress
+.navbar
+  a(href='/login')
+    i.fas.fa-sign-out-alt
+    span LOGOUT
+.container
+  h2(style='margin-right:700px') MANAGER STOCK REGISTRATION
+  form#stockForm(action='/registerStock' method='post' novalidate='')
+    fieldset
+      legend Manager Information
+      .form-group
+        label(for='managerName') Manager Name
+        input#managerName(type='text' placeholder='Enter manager name' required='' name='managerName' minlength='3' data-error='Manager name must be at least 3 characters')
+        span.error-message
+          i.fas.fa-exclamation-circle
+          span.error-text
+        span.success-message
+          i.fas.fa-check-circle
+          |             Looks good!
+      .form-group
+        label(for='managerId') Manager ID
+        input#managerId(type='text' placeholder='Enter manager ID' required='' name='managerId' pattern='[A-Z0-9]{4,10}' data-error='Manager ID must be 4-10 uppercase letters/numbers')
+        span.error-message
+          i.fas.fa-exclamation-circle
+          span.error-text
+      .form-group
+        label(for='date') Date of Registration
+        input#date(type='date' required='' name='date' data-error='Please select a valid date')
+        span.error-message
+          i.fas.fa-exclamation-circle
+          span.error-text
+    fieldset
+      legend Product Information
+      .form-group
+        label(for='productName') Product Name
+        select#productName(name='productName' required='' data-error='Please select a product')
+          option(value='') Select Product Name
+          option(value='beds') Beds
+          option(value='sofa') Sofa
+          option(value='dining tables') Dining Tables
+          option(value='cupboards') Cupboards
+          option(value='drawers') Drawers
+          option(value='timber') Timber
+          option(value='poles') Poles
+          option(value='hardwood') Hardwood
+          option(value='softwood') Softwood
+        span.error-message
+          i.fas.fa-exclamation-circle
+          span.error-text
+      .form-group
+        label(for='productType') Product Type
+        select#productType(name='productType' required='' data-error='Please select a product type')
+          option(value='') Select Product Type
+          option(value='home furniture') Home Furniture
+          option(value='office furniture') Office Furniture
+          option(value='wood') Wood
+        span.error-message
+          i.fas.fa-exclamation-circle
+          span.error-text
+      .form-group
+        label(for='costPrice') Cost Price (UGX)
+        input#costPrice(type='number' step='1000' placeholder='Enter cost price' required='' name='costPrice' min='1000' data-error='Cost price must be at least UGX 1,000')
+        i.fas.fa-info-circle.form-hint(data-hint='Enter the purchase cost')
+        span.error-message
+          i.fas.fa-exclamation-circle
+          span.error-text
+      .form-group
+        label(for='productPrice') Product Price (UGX)
+        input#productPrice(type='number' step='1000' placeholder='Enter product price' required='' name='productPrice' min='1000' data-error='Selling price must be at least UGX 1,000')
+        i.fas.fa-info-circle.form-hint(data-hint='Enter the selling price')
+        span.error-message
+          i.fas.fa-exclamation-circle
+          span.error-text
+      .form-group
+        label(for='quantity') Quantity
+        input#quantity(type='number' placeholder='Enter quantity' required='' name='quantity' min='1' data-error='Quantity must be at least 1')
+        span.error-message
+          i.fas.fa-exclamation-circle
+          span.error-text
+      .form-group
+        label(for='supplier') Supplier Name
+        input#supplier(type='text' placeholder='Enter supplier name' required='' name='supplierName' minlength='3' data-error='Supplier name must be at least 3 characters')
+        span.error-message
+          i.fas.fa-exclamation-circle
+          span.error-text
+      .form-group
+        label(for='quality') Quality
+        select#quality(name='quality' required='' data-error='Please select quality')
+          option(value='') Select Quality
+          option(value='good') Good
+          option(value='medium') Medium
+          option(value='bad') Bad
+        span.error-message
+          i.fas.fa-exclamation-circle
+          span.error-text
+      .form-group
+        label(for='color') Color
+        input#color(type='color' required='' name='color' data-error='Please select a color')
+        span.error-message
+          i.fas.fa-exclamation-circle
+          span.error-text
+      .form-group
+        label(for='measurement') Measurement (e.g., size in cm)
+        input#measurement(type='text' placeholder='Enter measurement details' required='' name='measurement' data-error='Please enter measurement details')
+        span.error-message
+          i.fas.fa-exclamation-circle
+          span.error-text
+    fieldset
+      legend Approval Status
+      .form-group
+        label(for='status') Status
+        select#status(name='status' required='' data-error='Please select a status')
+          option(value='pending') Pending Approval
+          option(value='approved') Approved for Sale
+          option(value='rejected') Rejected
+        span.error-message
+          i.fas.fa-exclamation-circle
+          span.error-text
+    button#submitBtn(type='submit')
+      i.fas.fa-check
+      |  Register Stock
+script.
+  const form = document.getElementById('stockForm');
+  const formProgress = document.getElementById('formProgress');
+  const submitBtn = document.getElementById('submitBtn');
+  const allInputs = form.querySelectorAll('input[required], select[required]');
+  // Real-time validation
+  allInputs.forEach(input => {
+  input.addEventListener('blur', () => validateField(input));
+  input.addEventListener('input', () => {
+  if (input.classList.contains('invalid')) {
+  validateField(input);
+  }
+  updateProgress();
+  });
+  });
+  // Validate individual field
+  function validateField(field) {
+  const formGroup = field.closest('.form-group');
+  const errorText = formGroup.querySelector('.error-text');
+  formGroup.classList.remove('has-error', 'has-success');
+  field.classList.remove('invalid', 'valid');
+  if (!field.validity.valid || field.value.trim() === '') {
+  formGroup.classList.add('has-error');
+  field.classList.add('invalid');
+  if (field.validity.valueMissing) {
+  errorText.textContent = 'This field is required';
+  } else if (field.validity.tooShort) {
+  errorText.textContent = field.dataset.error;
+  } else if (field.validity.patternMismatch) {
+  errorText.textContent = field.dataset.error;
+  } else if (field.validity.rangeUnderflow) {
+  errorText.textContent = field.dataset.error;
+  } else {
+  errorText.textContent = field.dataset.error || 'Invalid input';
+  }
+  return false;
+  } else {
+  formGroup.classList.add('has-success');
+  field.classList.add('valid');
+  return true;
+  }
+  }
+  // Update progress bar
+  function updateProgress() {
+  let validCount = 0;
+  allInputs.forEach(input => {
+  if (input.validity.valid && input.value.trim() !== '') {
+  validCount++;
+  }
+  });
+  const progress = (validCount / allInputs.length) * 100;
+  formProgress.style.width = progress + '%';
+  }
+  // Form submission
+  form.addEventListener('submit', (e) => {
+  e.preventDefault();
+  let isValid = true;
+  allInputs.forEach(input => {
+  if (!validateField(input)) {
+  isValid = false;
+  }
+  });
+  if (isValid) {
+  // Show loading state
+  submitBtn.classList.add('loading');
+  submitBtn.disabled = true;
+  submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Registering...';
+  // Submit form after animation
+  setTimeout(() => {
+  form.submit();
+  }, 1000);
+  } else {
+  // Scroll to first error
+  const firstError = form.querySelector('.has-error');
+  if (firstError) {
+  firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+  }
+  });
+  // Custom validation for price comparison
+  const costPrice = document.getElementById('costPrice');
+  const productPrice = document.getElementById('productPrice');
+  productPrice.addEventListener('blur', () => {
+  if (costPrice.value && productPrice.value) {
+  if (parseFloat(productPrice.value) < parseFloat(costPrice.value)) {
+  const formGroup = productPrice.closest('.form-group');
+  formGroup.classList.add('has-error');
+  productPrice.classList.add('invalid');
+  formGroup.querySelector('.error-text').textContent = 'Selling price should be higher than cost price';
+  }
+  }
+  });
+  // Initialize progress
+  updateProgress();

@@ -9,7 +9,6 @@ html
 
   body
     .top-bar
-      a.back-btn(href='/attendant') BACK
       a.logout-btn(href='/logout') LOGOUT
 
     .container
@@ -48,7 +47,7 @@ html
                 td
                   a.btn.btn-receipt(href=`/getReceipt/${sale._id}` target='_blank') RECEIPT
                   if userRole === 'Manager'
-                    a.btn.btn-edit(href=`/sales/edit/${sale._id}`) EDIT
+                    a.btn.btn-edit(href=`/editSales/${sale._id}`) EDIT
                     form.delete-form(method='POST' action=`/sales/delete/${sale._id}` onsubmit="return confirm('Delete this sale?')" style='display:inline')
                       button.btn.btn-delete(type='submit') DELETE
           else

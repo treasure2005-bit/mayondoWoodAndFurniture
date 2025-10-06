@@ -41,6 +41,18 @@ const attendantstockSchema = new mongoose.Schema({
     type: String,
     required: false,
   },
+  recordedBy: {
+    type: String,
+    required: true,
+  },
+  attendantId: {
+    type: String,
+    required: false,
+  },
+  recordedAt: {
+    type: Date,
+    default: Date.now,
+  },
 });
 
 module.exports = mongoose.model("attendantstockModel", attendantstockSchema);

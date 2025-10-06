@@ -498,6 +498,9 @@ form[action="/registerStock"] button {
   font-weight: bold;
 }
 
+
+
+
 /* Style the main heading */
 h2 {
   color: #003366;
@@ -586,7 +589,7 @@ h2 {
     font-size: 14px;
 }
 
-/* Stack table on mobile */
+/* Stock table on mobile */
 @media (max-width: 768px) {
     #stockTable, #stockTable tbody, #stockTable th, #stockTable td, #stockTable tr {
         display: block;
