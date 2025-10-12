@@ -1,105 +1,106 @@
-doctype html
-html
-  head
-    meta(charset='UTF-8')
-    meta(name='viewport' content='width=device-width, initial-scale=1.0')
-    title Record Stock
-    link(rel='stylesheet' href='/css/attendantstock.css')
-    link(href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css' rel='stylesheet')
-  body
-    nav.navbar
-      .nav-brand
-      .nav-links
-      .buttons
-        a.logout(href='/login')
-          i.fas.fa-sign-out-alt
-          |  Logout
+extends layout.pug
 
-    #stock.tab-content.active
-      .form-container
-        h3 RECORD STOCK
-        form#stockForm(action='/attendantstock' method='post' novalidate)
-          .form-row
-            .form-group
-              label(for='stockProductName') Product Name:
-              select#stockProductName(name='productName' required)
-                option(value='') Select Product Name
-                option(value='timber') Timber
-                option(value='poles') Poles
-                option(value='hardwood') Hard Wood
-                option(value='softwood') Soft Wood
-            .form-group
-              label(for='stockProductType') Product Type:
-              select#stockProductType(name='productType' required)
-                option(value='') Select Product Type
-                option(value='wood') Wood
+block head
+  link(rel='stylesheet' href='/css/attendantstock.css')
 
-          .form-row
-            .form-group
-              label(for='stockPrice') Product Price:
-              input#stockPrice(type='number' step='1000' name='productPrice' required)
-            .form-group
-              label(for='stockCostPrice') Cost Price:
-              input#stockCostPrice(type='number' step='1000' name='costPrice' required)
-            .form-group
-              label(for='stockQuantity') Quantity:
-              input#stockQuantity(type='number' name='quantity' required)
+block content
+  nav.navbar
+    .nav-brand
+      i.fas.fa-boxes
+      | MWF Inventory
+    .nav-buttons
+      a(href='/attendant')
+        i.fas.fa-home
+        | Dashboard
+      a.logout(href='/login')
+        i.fas.fa-sign-out-alt
+        | Logout
 
-          .form-row
-            .form-group
-              label(for='stockSupplier') Supplier Name:
-              input#stockSupplier(type='text' name='supplierName' required)
-            .form-group
-              label(for='stockDate') Date:
-              input#stockDate(type='date' name='date' required)
-            .form-group
-              label(for='stockQuality') Quality:
-              select#stockQuality(name='quality' required)
-                option(value='') Select Quality
-                option(value='premium') Good
-                option(value='standard') Medium
-                option(value='economy') Bad
+  #stock.tab-content.active
+    .form-container
+      h3 RECORD STOCK
+      form#stockForm(action='/attendantstock' method='post' novalidate)
+        .form-row
+          .form-group
+            label(for='stockProductName') Product Name:
+            select#stockProductName(name='productName' required)
+              option(value='') Select Product Name
+              option(value='timber') Timber
+              option(value='poles') Poles
+              option(value='hardwood') Hard Wood
+              option(value='softwood') Soft Wood
+          .form-group
+            label(for='stockProductType') Product Type:
+            select#stockProductType(name='productType' required)
+              option(value='') Select Product Type
+              option(value='wood') Wood
 
-          .form-row
-            .form-group
-              label(for='stockColor') Color (Optional):
-              input#stockColor(type='text' name='color')
-            .form-group
-              label(for='stockMeasurements') Measurements (Optional):
-              input#stockMeasurements(type='text' placeholder='e.g., 2m x 4m x 1cm' name='measurements')
+        .form-row
+          .form-group
+            label(for='stockPrice') Product Price:
+            input#stockPrice(type='number' step='1000' name='productPrice' required)
+          .form-group
+            label(for='stockCostPrice') Cost Price:
+            input#stockCostPrice(type='number' step='1000' name='costPrice' required)
+          .form-group
+            label(for='stockQuantity') Quantity:
+            input#stockQuantity(type='number' name='quantity' required)
 
-          .button-group
-            button.btn.btn-primary(type='submit') Record Stock
-            button.btn.btn-success(type='button' onclick='generateStockReport()') Generate Stock Report
+        .form-row
+          .form-group
+            label(for='stockSupplier') Supplier Name:
+            input#stockSupplier(type='text' name='supplierName' required)
+          .form-group
+            label(for='stockDate') Date:
+            input#stockDate(type='date' name='date' required)
+          .form-group
+            label(for='stockQuality') Quality:
+            select#stockQuality(name='quality' required)
+              option(value='') Select Quality
+              option(value='premium') Good
+              option(value='standard') Medium
+              option(value='economy') Bad
 
-    script.
-      function generateStockReport() {
-        window.location.href = '/stockreport';
-      }
+        .form-row
+          .form-group
+            label(for='stockColor') Color (Optional):
+            input#stockColor(type='text' name='color')
+          .form-group
+            label(for='stockMeasurements') Measurements (Optional):
+            input#stockMeasurements(type='text' placeholder='e.g., 2m x 4m x 1cm' name='measurements')
 
-      // Validation Script
-      const form = document.getElementById('stockForm');
-      form.addEventListener('submit', (e) => {
-        const inputs = form.querySelectorAll('input[required], select[required]');
-        let valid = true;
+        .button-group
+          button.btn.btn-primary(type='submit') Record Stock
+          button.btn.btn-success(type='button' onclick='generateStockReport()') Generate Stock Report
 
-        inputs.forEach(input => {
-          const formGroup = input.closest('.form-group');
-          const error = formGroup.querySelector('.error-message') || document.createElement('div');
-          error.classList.add('error-message');
+  script.
+    function generateStockReport() {
+      window.location.href = '/stockreport';
+    }
 
-          if (!input.value.trim()) {
-            error.textContent = 'This field is required';
-            input.classList.add('error');
-            input.classList.remove('success');
-            formGroup.appendChild(error);
-            valid = false;
-          } else {
-            error.textContent = '';
-            input.classList.remove('error');
-            input.classList.add('success');
-          }
-        });
+    // Validation Script
+    const form = document.getElementById('stockForm');
+    form.addEventListener('submit', (e) => {
+      const inputs = form.querySelectorAll('input[required], select[required]');
+      let valid = true;
 
-        if (!valid) e.preventDefault();
+      inputs.forEach(input => {
+        const formGroup = input.closest('.form-group');
+        const error = formGroup.querySelector('.error-message') || document.createElement('div');
+        error.classList.add('error-message');
+
+        if (!input.value.trim()) {
+          error.textContent = 'This field is required';
+          input.classList.add('error');
+          input.classList.remove('success');
+          formGroup.appendChild(error);
+          valid = false;
+        } else {
+          error.textContent = '';
+          input.classList.remove('error');
+          input.classList.add('success');
+        }
       });
+
+      if (!valid) e.preventDefault();
+    });

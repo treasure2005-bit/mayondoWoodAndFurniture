@@ -1,55 +1,60 @@
-doctype html
-html
-  head
-    meta(charset='UTF-8')
-    meta(name='viewport' content='width=device-width, initial-scale=1.0')
-    title Sales Records
-    link(rel='stylesheet' href='/css/salesTable.css')
-    link(href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css' rel='stylesheet')
+extends layout.pug
 
-  body
-    .top-bar
-      a.logout-btn(href='/logout') LOGOUT
+block head
+  link(rel='stylesheet' href='/css/salesTable.css')
 
-    .container
-      .page-header
-        h1 Sales Records
-        a.add-sale-btn(href='/recordingSales') + Add Sale
+block content
+  nav.navbar
+    .nav-brand
+      i.fas.fa-boxes
+      | MWF Inventory
+    .nav-buttons
+      a(href='/dashboard')
+        i.fas.fa-home
+        | Dashboard
+      a.logout(href='/login')
+        i.fas.fa-sign-out-alt
+        | Logout
 
-      table
-        thead
-          tr
-            th Customer Name
-            th Product
-            th Type
-            th Quantity
-            th Unit Price
-            th Total
-            th Date
-            th Payment
-            th Agent
-            th Transport
-            th Actions
-        tbody
-          if sales && sales.length > 0
-            each sale in sales
-              tr
-                td= sale.customerName
-                td= sale.productName
-                td= sale.productType
-                td= sale.quantitySold
-                td UGX #{sale.unitPrice.toLocaleString()}
-                td UGX #{(sale.quantitySold * sale.unitPrice).toLocaleString()}
-                td= sale.date
-                td= sale.paymentType
-                td= sale.salesAgent ? sale.salesAgent.username : 'No Agent'
-                td= sale.checkBox === 'on' ? '1800' : 'No'
-                td
-                  a.btn.btn-receipt(href=`/getReceipt/${sale._id}` target='_blank') RECEIPT
-                  if userRole === 'Manager'
-                    a.btn.btn-edit(href=`/editSales/${sale._id}`) EDIT
-                    form.delete-form(method='POST' action=`/sales/delete/${sale._id}` onsubmit="return confirm('Delete this sale?')" style='display:inline')
-                      button.btn.btn-delete(type='submit') DELETE
-          else
+  .container
+    .page-header
+      h1 Sales Records
+      a.add-sale-btn(href='/recordingSales') + Add Sale
+
+    table
+      thead
+        tr
+          th Customer Name
+          th Product
+          th Type
+          th Quantity
+          th Unit Price
+          th Total
+          th Date
+          th Payment
+          th Agent
+          th Transport
+          th Actions
+      tbody
+        if sales && sales.length > 0
+          each sale in sales
             tr
-              td(colspan='11' style='text-align: center;') No sales records found
+              td= sale.customerName
+              td= sale.productName
+              td= sale.productType
+              td= sale.quantitySold
+              td UGX #{sale.unitPrice.toLocaleString()}
+              td UGX #{(sale.quantitySold * sale.unitPrice).toLocaleString()}
+              td= sale.date
+              td= sale.paymentType
+              td= sale.salesAgent ? sale.salesAgent.username : 'No Agent'
+              td= sale.checkBox === 'on' ? '1800' : 'No'
+              td
+                a.btn.btn-receipt(href=`/getReceipt/${sale._id}` target='_blank') RECEIPT
+                if userRole === 'Manager'
+                  a.btn.btn-edit(href=`/editSales/${sale._id}`) EDIT
+                  form.delete-form(method='POST' action=`/sales/delete/${sale._id}` onsubmit="return confirm('Delete this sale?')" style='display:inline')
+                    button.btn.btn-delete(type='submit') DELETE
+        else
+          tr
+            td(colspan='11' style='text-align: center;') No sales records found

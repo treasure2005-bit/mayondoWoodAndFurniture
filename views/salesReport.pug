@@ -1,7 +1,8 @@
 extends layout.pug
 
 block head
-  link(rel='stylesheet' href='/css/reports.css')
+  link(rel='stylesheet', href='/css/reports.css')
+  link(rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css')
 
 block content
   nav.navbar
@@ -9,19 +10,18 @@ block content
       i.fas.fa-boxes
       | MWF Inventory
     .nav-buttons
-      a(href='/dashboard')
+      a(href='/attendant')
         i.fas.fa-home
         | Dashboard
       a.logout(href='/login')
         i.fas.fa-sign-out-alt
         | Logout
-    
+
   .container
     h2 REPORTS
 
-    //- Date Filter Section
     .filter-section
-      form(method='GET' action='/reports')
+      form(method='GET' action='/salesReport')
         .date-filters
           .filter-group
             label(for='startDate') From:
@@ -35,59 +35,7 @@ block content
           a.btn-reset(href='/reports')
             i.fas.fa-redo
             span RESET
-
-    //- STOCK REPORT SECTION
-    .report-section
-      .report-header
-        h3 
-          i.fas.fa-boxes
-          span STOCK REPORT
-        button.btn-download(onclick='downloadStockReport()')
-          i.fas.fa-download
-          span DOWNLOAD 
-      
-      .table-wrapper
-        table#stockTable
-          thead
-            tr
-              th Manager
-              th Manager ID
-              th Date
-              th Product Name
-              th Product Type
-              th Cost Price
-              th Product Price
-              th Quantity
-              th Supplier
-              th Quality
-              th Color
-              th Measurement
-              th Status
-          tbody
-            if stock && stock.length
-              each item in stock
-                tr
-                  td= item.managerName
-                  td= item.managerId
-                  td= item.date.toDateString()
-                  td= item.productName
-                  td= item.productType
-                  td= item.costPrice
-                  td= item.productPrice
-                  td= item.quantity
-                  td= item.supplierName
-                  td= item.quality
-                  td= item.color
-                  td= item.measurement
-                  td= item.status
-            else
-              tr
-                td(colspan='12' style='text-align: center; padding: 20px; color: #6c757d;')
-                  i.fas.fa-inbox(style='font-size: 48px; margin-bottom: 10px;')
-                  br
-                  | No stock records found for selected date range
-
-    //- SALES REPORT SECTION
+    
     .report-section
       .report-header
         h3
@@ -95,8 +43,7 @@ block content
           span SALES REPORT
         button.btn-download(onclick='downloadSalesReport()')
           i.fas.fa-download
-          span DOWNLOAD 
-      
+          span DOWNLOAD
       .table-wrapper
         table#salesTable
           thead
@@ -126,7 +73,6 @@ block content
                   br
                   | No sales records found for selected date range
 
-  //- JavaScript for CSV Download
   script.
     function downloadStockReport() {
       const table = document.getElementById('stockTable');

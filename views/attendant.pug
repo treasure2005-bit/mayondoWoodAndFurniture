@@ -25,7 +25,7 @@ body.dashboard-page
         | Welcome Back, 
         span#attendantName Attendant
         | !
-      p Manage MWF operations efficiently
+      p Manage Mayondo Wood And Furniture operations efficiently
       #currentTime.time-display
       
     // Quick Stats
@@ -133,12 +133,10 @@ body.dashboard-page
               i.fas.fa-warehouse
               span Update inventory upon receipt
         .card-actions
-          a.btn-primary(href='/offloading/new')
+          a.btn-primary(href='/offloadingform')
             i.fas.fa-plus
             |  New Offloading Form
-          a.btn-secondary(href='/offloading/view')
-            i.fas.fa-eye
-            |  View Forms
+          
             
       // Reports
       .card.reports-card
@@ -157,35 +155,14 @@ body.dashboard-page
               i.fas.fa-chart-line
               span Stock level reports
         .card-actions
-          a.btn-primary(href='/reports')
+          a.btn-primary(href='/salesReport')
             i.fas.fa-chart-line
             |  Sales Report
-          a.btn-secondary(href='/reports')
+          a.btn-secondary(href='/stockreport')
             i.fas.fa-boxes
             |  Stock Report
             
-      // Quick Actions
-      .card.quick-actions-card
-        .card-header
-          .card-icon
-            i.fas.fa-bolt
-          .card-title
-            h3 Quick Actions
-            p Frequently used operations
-        .card-content
-          .quick-actions-grid
-            a.quick-action(href='/sales/new')
-              i.fas.fa-cash-register
-              span New Sale
-            a.quick-action(href='/stock/low')
-              i.fas.fa-exclamation-triangle
-              span Low Stock
-            a.quick-action(href='/customers')
-              i.fas.fa-users
-              span Customers
-            a.quick-action(href='/suppliersTable')
-              i.fas.fa-truck
-              span Suppliers
+      
               
     // Recent Activity
     .recent-activity

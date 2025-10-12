@@ -1,0 +1,138 @@
+extends layout.pug
+
+block head
+  link(rel='stylesheet' href='/css/products.css')
+
+block content
+  nav.navbar
+    .nav-brand
+      i.fas.fa-boxes
+      | MWF Inventory
+    .nav-buttons
+      a(href='/dashboard')
+        i.fas.fa-home
+        | Dashboard
+      a.logout(href='/login')
+        i.fas.fa-sign-out-alt
+        | Logout
+
+  .container
+    .header-section
+      h2
+        i.fas.fa-warehouse
+        |  PRODUCTS INVENTORY
+      .stats-summary
+        .stat-card
+          h3#totalProducts= products.length
+          p Total Products
+        .stat-card
+          h3#totalQuantity= totalQuantity
+          p Total Items
+        .stat-card.stat-low
+          h3#lowStockCount= lowStockCount
+          p Low Stock Alerts
+
+    .filters-section
+      .search-box
+        input#searchInput(type='text' placeholder='Search products...')
+        i.fas.fa-search
+      select#typeFilter.filter-select
+        option(value='all') All Types
+        option(value='home furniture') Home Furniture
+        option(value='office furniture') Office Furniture
+        option(value='wood') Wood
+      select#statusFilter.filter-select
+        option(value='all') All Status
+        option(value='in-stock') In Stock
+        option(value='low-stock') Low Stock
+        option(value='out-stock') Out of Stock
+
+    .table-container
+      if products && products.length > 0
+        table#productsTable
+          thead
+            tr
+              th NO.
+              th Product Name
+              th Type
+              th Quantity
+              th Status
+              th Cost Price
+              th Selling Price
+              th Quality
+              th Color
+              th Supplier
+              th Actions
+          tbody
+            each product, index in products
+              - const quantity = product.quantity || 0
+              - const status = quantity === 0 ? 'out-stock' : quantity <= 5 ? 'low-stock' : 'in-stock'
+              - const statusText = quantity === 0 ? 'Out of Stock' : quantity <= 5 ? 'Low Stock' : 'In Stock'
+              - const statusClass = quantity === 0 ? 'status-out-stock' : quantity <= 5 ? 'status-low-stock' : 'status-in-stock'
+              tr(data-type=product.productType data-status=status)
+                td= index + 1
+                td.product-name= product.productName
+                td= product.productType
+                td.quantity-cell(style=quantity === 0 ? 'color: #dc3545;' : quantity <= 5 ? 'color: #ffc107;' : 'color: #28a745;')= quantity
+                td
+                  span(class=`status-badge ${statusClass}`)= statusText
+                td.price-tag UGX #{product.costPrice ? product.costPrice.toLocaleString() : '0'}
+                td.price-tag UGX #{product.productPrice ? product.productPrice.toLocaleString() : '0'}
+                td
+                  span(class=`quality-badge quality-${product.quality}`)= product.quality
+                td
+                  .color-swatch(style=`background-color: ${product.color};`)
+                td= product.supplierName
+                td
+                  .action-buttons
+                    a.btn.btn-view(href=`/productDetails/${product._id}`)
+                      i.fas.fa-eye
+                      | View
+      else
+        .empty-state
+          i.fas.fa-box-open
+          h3 No Products Found
+          p Start by registering stock items
+
+  script.
+    const searchInput = document.getElementById('searchInput');
+    const typeFilter = document.getElementById('typeFilter');
+    const statusFilter = document.getElementById('statusFilter');
+    const tableRows = document.querySelectorAll('#productsTable tbody tr');
+    
+    function filterTable() {
+      const searchTerm = searchInput.value.toLowerCase();
+      const typeValue = typeFilter.value;
+      const statusValue = statusFilter.value;
+      
+      let visibleCount = 0;
+      
+      tableRows.forEach(row => {
+        const productName = row.querySelector('.product-name').textContent.toLowerCase();
+        const productType = row.dataset.type;
+        const productStatus = row.dataset.status;
+        
+        const matchesSearch = productName.includes(searchTerm);
+        const matchesType = typeValue === 'all' || productType === typeValue;
+        const matchesStatus = statusValue === 'all' || productStatus === statusValue;
+        
+        if (matchesSearch && matchesType && matchesStatus) {
+          row.style.display = '';
+          visibleCount++;
+        } else {
+          row.style.display = 'none';
+        }
+      });
+      
+      // Update total products count
+      document.getElementById('totalProducts').textContent = visibleCount;
+    }
+    
+    searchInput.addEventListener('input', filterTable);
+    typeFilter.addEventListener('change', filterTable);
+    statusFilter.addEventListener('change', filterTable);
+    
+    // Auto-refresh every 30 seconds
+    setInterval(() => {
+      location.reload();
+    }, 30000);

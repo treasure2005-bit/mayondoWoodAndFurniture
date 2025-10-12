@@ -22,10 +22,59 @@ body {
   width: fit-content;
 }
 
-.back-btn:hover {
-  background: rgba(255, 255, 255, 0.2);
-  transform: translateX(-5px);
-}
+.navbar {
+      background: rgba(255, 255, 255, 0.95);
+      padding: 15px 30px;
+      border-radius: 10px;
+      margin-bottom: 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .nav-brand {
+      font-size: 24px;
+      font-weight: bold;
+      color: #0a0a0b;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .nav-buttons {
+      display: flex;
+      gap: 15px;
+    }
+
+    .nav-buttons a {
+      padding: 10px 20px;
+      border-radius: 5px;
+      text-decoration: none;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .nav-buttons a:first-child {
+      background: #667eea;
+      color: white;
+    }
+
+    .nav-buttons a:first-child:hover {
+      background: #5568d3;
+    }
+
+    .nav-buttons a.logout {
+      background: #ef4444;
+      color: white;
+    }
+
+    .nav-buttons a.logout:hover {
+      background: #dc2626;
+    }
+
 
 .management-container {
   display: flex;

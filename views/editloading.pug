@@ -1,0 +1,99 @@
+extends layout.pug
+
+block head
+  link(rel='stylesheet' href='/css/loadingform.css')
+  link(href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css' rel='stylesheet')
+
+block content
+  nav.navbar
+    .nav-brand
+    .nav-links
+    .buttons
+      a(href='/attendant')
+        i.fas.fa-home
+        |  Dashboard
+      a(href='/loadinglist')
+        i.fas.fa-list
+        |  Loading List
+      a.logout(href='/login')
+        i.fas.fa-sign-out-alt
+        |  Logout
+
+  .card.loading-card
+    .card-header
+      .card-title
+        h3 EDIT LOADING OPERATION
+        p Update loading operation details
+    
+    .card-content
+      form(action=`/loadingform/${loading._id}/update` method='POST')
+        .form-grid
+          
+          .form-section
+            h4 Loading Details
+            .form-group
+              label(for='loadingDate') Date & Time *
+              input#loadingDate(type='datetime-local' name='loadingDate' value=loading.loadingDate required)
+            
+            .form-group
+              label(for='vehicleInfo') Vehicle Information *
+              input#vehicleInfo(type='text' name='vehicleInfo' value=loading.vehicleInfo required)
+            
+            .form-group
+              label(for='driverName') Driver Name *
+              input#driverName(type='text' name='driverName' value=loading.driverName required)
+            
+            .form-group
+              label(for='destination') Destination *
+              input#destination(type='text' name='destination' value=loading.destination required)
+
+          .form-section
+            h4 Products
+            .form-group
+              label(for='productCategory') Product Category *
+              select#productCategory(name='productCategory' required)
+                option(value='timber' selected=loading.productCategory === 'timber') Wood Products 
+                option(value='furniture' selected=loading.productCategory === 'furniture') Furniture
+            
+            .form-group
+              label(for='productName') Product Name *
+              input#productName(type='text' name='productName' value=loading.productName required)
+            
+            .form-row
+              .form-group.half-width
+                label(for='quantity') Quantity *
+                input#quantity(type='number' name='quantity' value=loading.quantity min='1' required)
+              
+              .form-group.half-width
+                label(for='unit') Unit *
+                select#unit(name='unit' required)
+                  option(value='pieces' selected=loading.unit === 'pieces') Pieces
+                  option(value='kg' selected=loading.unit === 'kg') Kilograms
+                  option(value='tons' selected=loading.unit === 'tons') Tons
+                  option(value='cubic_meters' selected=loading.unit === 'cubic_meters') Cubic Meters
+                  option(value='sets' selected=loading.unit === 'sets') Sets
+
+          .form-section
+            h4 Additional Information
+            .form-group
+              label(for='attendantName') Attendant Name *
+              input#attendantName(type='text' name='attendantName' value=loading.attendantName required)
+            
+            .form-group
+              label(for='specialInstructions') Special Instructions
+              textarea#specialInstructions(name='specialInstructions' rows='3')= loading.specialInstructions
+            
+            .form-group
+              label(for='priority') Priority Level *
+              select#priority(name='priority' required)
+                option(value='normal' selected=loading.priority === 'normal') Normal
+                option(value='urgent' selected=loading.priority === 'urgent') Urgent
+                option(value='low' selected=loading.priority === 'low') Low Priority
+
+        .card-actions
+          a.btn-secondary(href='/loadinglist')
+            i.fas.fa-arrow-left
+            | Cancel
+          button.btn-primary(type='submit')
+            i.fas.fa-save
+            | Update Loading

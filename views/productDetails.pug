@@ -1,0 +1,106 @@
+extends layout.pug
+
+block head
+  link(rel='stylesheet' href='/css/productsDetails.css')
+  link(rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css')
+
+block content
+  .navbar
+    a(href='/products')
+      i.fas.fa-arrow-left
+      span BACK TO PRODUCTS
+    a(href='/login')
+      i.fas.fa-sign-out-alt
+      span LOGOUT
+  
+  .container
+    .product-header
+      h1= product.productName
+      .product-type= product.productType
+    
+    - const quantity = product.quantity || 0
+    - const status = quantity === 0 ? 'out-stock' : quantity <= 5 ? 'low-stock' : 'in-stock'
+    - const statusText = quantity === 0 ? '⚠️ OUT OF STOCK' : quantity <= 5 ? '⚠️ LOW STOCK WARNING' : '✅ IN STOCK'
+    
+    .status-banner(class=status)
+      = statusText
+    
+    .details-grid
+      .detail-card.quantity
+        h3
+          i.fas.fa-boxes
+          | Current Quantity
+        p= quantity
+      
+      .detail-card
+        h3
+          i.fas.fa-tag
+          | Product Type
+        p(style='text-transform: capitalize;')= product.productType
+      
+      .detail-card
+        h3
+          i.fas.fa-truck
+          | Supplier
+        p= product.supplierName
+      
+      .detail-card
+        h3
+          i.fas.fa-star
+          | Quality
+        p
+          span(class=`quality-badge quality-${product.quality}`)= product.quality
+      
+      .detail-card
+        h3
+          i.fas.fa-palette
+          | Color
+        p
+          .color-preview(style=`background-color: ${product.color};`)
+      
+      .detail-card
+        h3
+          i.fas.fa-ruler
+          | Measurement
+        p= product.measurement
+      
+      .detail-card
+        h3
+          i.fas.fa-calendar
+          | Date Registered
+        p= moment(product.date).format('MMM DD, YYYY')
+      
+      .detail-card
+        h3
+          i.fas.fa-user-tie
+          | Manager
+        p= product.managerName
+    
+    .price-section
+      .price-row
+        .price-label
+          i.fas.fa-dollar-sign
+          |  Cost Price
+        .price-value UGX #{product.costPrice.toLocaleString()}
+      
+      .price-row
+        .price-label
+          i.fas.fa-money-bill-wave
+          |  Selling Price
+        .price-value UGX #{product.productPrice.toLocaleString()}
+      
+      - const profit = product.productPrice - product.costPrice
+      - const profitPercentage = ((profit / product.costPrice) * 100).toFixed(2)
+      
+      .profit-margin
+        i.fas.fa-chart-line
+        |  Profit Margin: 
+        span UGX #{profit.toLocaleString()} (#{profitPercentage}%)
+    
+    .action-buttons
+      a.btn.btn-primary(href='/products')
+        i.fas.fa-warehouse
+        | View All Products
+      a.btn.btn-secondary(href='/editstock/' + product._id)
+        i.fas.fa-edit
+        | Edit Product

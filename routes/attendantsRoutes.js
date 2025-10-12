@@ -13,7 +13,7 @@ const isAttendant = (req, res, next) => {
   res.redirect("/login");
 };
 
-// ============ DASHBOARD PAGE ============
+//DASHBOARD PAGE
 router.get("/attendant", isAttendant, (req, res) => {
   res.render("attendant", {
     title: "Attendant Dashboard",
@@ -21,7 +21,7 @@ router.get("/attendant", isAttendant, (req, res) => {
   });
 });
 
-// ============ DASHBOARD STATS API ============
+//DASHBOARD STATS API 
 router.get("/api/attendant/stats", isAttendant, async (req, res) => {
   try {
     const today = new Date();
@@ -75,7 +75,7 @@ router.get("/api/attendant/stats", isAttendant, async (req, res) => {
   }
 });
 
-// ============ RECENT ACTIVITY API ============
+//RECENT ACTIVITY API 
 router.get("/api/attendant/recent-activity", isAttendant, async (req, res) => {
   try {
     // Get recent sales (last 10)
@@ -147,7 +147,7 @@ router.get("/api/attendant/recent-activity", isAttendant, async (req, res) => {
   }
 });
 
-// ============ RECORDING SALES PAGE ============
+//RECORDING SALES PAGE 
 router.get("/recordingSales", isAttendant, (req, res) => {
   res.render("recordingSales", {
     title: "Record Sales",
@@ -155,7 +155,7 @@ router.get("/recordingSales", isAttendant, (req, res) => {
   });
 });
 
-// ============ ATTENDANT STOCK PAGE ============
+//ATTENDANT STOCK PAGE
 router.get("/attendantstock", isAttendant, async (req, res) => {
   try {
     const stocks = await attendantstockModel.find().sort({ date: -1 });
@@ -170,7 +170,8 @@ router.get("/attendantstock", isAttendant, async (req, res) => {
   }
 });
 
-// ============ LOADING FORM PAGE ============
+
+//LOADING FORM ROUTES
 router.get("/loadingform", isAttendant, (req, res) => {
   res.render("loadingform", {
     title: "Loading Form",
@@ -178,7 +179,140 @@ router.get("/loadingform", isAttendant, (req, res) => {
   });
 });
 
-// ============ SUPPLIERS TABLE PAGE ============
+router.post("/loadingform", isAttendant, async (req, res) => {
+  if (req.is('application/json')) {
+    try {
+      const loadingData = new Loading({
+        loadingDate: req.body.loadingDate,
+        vehicleInfo: req.body.vehicleInfo,
+        driverName: req.body.driverName,
+        destination: req.body.destination,
+        productCategory: req.body.productCategory,
+        productName: req.body.productName,
+        quantity: req.body.quantity,
+        unit: req.body.unit,
+        attendantName: req.body.attendantName,
+        specialInstructions: req.body.specialInstructions,
+        priority: req.body.priority,
+        createdBy: req.user._id,
+        createdByName: req.user.fullName
+      });
+
+      await loadingData.save();
+
+      res.json({
+        success: true,
+        message: 'Loading operation recorded successfully!',
+        redirectUrl: '/loadinglist',
+        data: loadingData
+      });
+
+    } catch (error) {
+      console.error('Loading form submission error:', error);
+      
+      if (error.name === 'ValidationError') {
+        return res.status(400).json({
+          success: false,
+          message: 'Validation error: ' + Object.values(error.errors).map(e => e.message).join(', ')
+        });
+      }
+
+      res.status(500).json({
+        success: false,
+        message: 'Failed to record loading operation. Please try again.'
+      });
+    }
+  } else {
+    try {
+      const loadingData = new Loading(req.body);
+      loadingData.createdBy = req.user._id;
+      loadingData.createdByName = req.user.fullName;
+      
+      await loadingData.save();
+      res.redirect('/loadinglist');
+    } catch (error) {
+      console.error('Loading form error:', error);
+      res.status(500).send('Error saving loading form');
+    }
+  }
+});
+
+//LOADING LIST PAGE
+router.get("/loadinglist", isAttendant, async (req, res) => {
+  try {
+    const loadings = await Loading.find().sort({ loadingDate: -1 });
+    
+    res.render("loadinglist", {
+      title: "All Loading Operations",
+      loadings: loadings,
+      user: req.user,
+    });
+  } catch (error) {
+    console.error("Error fetching loadings:", error);
+    res.status(500).send("Error loading loadings page");
+  }
+});
+
+//EDIT LOADING PAGE
+router.get("/loadingform/:id/edit", isAttendant, async (req, res) => {
+  try {
+    const loading = await Loading.findById(req.params.id);
+    
+    if (!loading) {
+      return res.status(404).send("Loading record not found");
+    }
+    
+    res.render("editloading", {
+      title: "Edit Loading",
+      loading: loading,
+      user: req.user,
+    });
+  } catch (error) {
+    console.error("Error fetching loading:", error);
+    res.status(500).send("Error loading edit page");
+  }
+});
+
+//UPDATE LOADING
+router.post("/loadingform/:id/update", isAttendant, async (req, res) => {
+  try {
+    await Loading.findByIdAndUpdate(req.params.id, {
+      loadingDate: req.body.loadingDate,
+      vehicleInfo: req.body.vehicleInfo,
+      driverName: req.body.driverName,
+      destination: req.body.destination,
+      productCategory: req.body.productCategory,
+      productName: req.body.productName,
+      quantity: req.body.quantity,
+      unit: req.body.unit,
+      attendantName: req.body.attendantName,
+      specialInstructions: req.body.specialInstructions,
+      priority: req.body.priority,
+      updatedBy: req.user._id,
+      updatedAt: new Date()
+    });
+    
+    res.redirect("/loadinglist");
+  } catch (error) {
+    console.error("Error updating loading:", error);
+    res.status(500).send("Error updating loading record");
+  }
+});
+
+
+//DELETE LOADING
+router.post("/loadingform/:id/delete", isAttendant, async (req, res) => {
+  try {
+    await Loading.findByIdAndDelete(req.params.id);
+    res.redirect("/loadinglist");
+  } catch (error) {
+    console.error("Error deleting loading:", error);
+    res.status(500).send("Error deleting loading record");
+  }
+});
+
+
+//SUPPLIERS TABLE PAGE
 router.get("/suppliersTable", isAttendant, async (req, res) => {
   try {
     const suppliers = await Supplier.find().sort({ createdAt: -1 });
@@ -193,7 +327,7 @@ router.get("/suppliersTable", isAttendant, async (req, res) => {
   }
 });
 
-// ============ LOW STOCK API ============
+// LOW STOCK API
 router.get("/api/attendant/low-stock", isAttendant, async (req, res) => {
   try {
     const lowStockItems = await attendantstockModel
@@ -211,6 +345,8 @@ router.get("/api/attendant/low-stock", isAttendant, async (req, res) => {
       .json({ success: false, message: "Error fetching low stock items" });
   }
 });
+
+
 
 // Helper function to format time ago
 function formatTimeAgo(date) {

@@ -4,10 +4,120 @@ head
   meta(name='viewport' content='width=device-width, initial-scale=1.0')
   title Login Page
   link(rel='stylesheet' href='/css/style.css')
-.login-box
-  h2 LOGIN
-  form(onsubmit='return loginUser(event)' action='/login' method='post')
-    input#email(type='text' name='email' placeholder='Enter email' required)
-    input#password(type='password' name='password' placeholder='Enter password' required)
-    button(type='submit') Login
-script(src='/script.js')
+  style.
+    .error-message {
+      background-color: #f8d7da;
+      color: #721c24;
+      padding: 10px;
+      margin-bottom: 15px;
+      border: 1px solid #f5c6cb;
+      border-radius: 4px;
+      text-align: center;
+    }
+    
+    .success-message {
+      background-color: #d4edda;
+      color: #155724;
+      padding: 10px;
+      margin-bottom: 15px;
+      border: 1px solid #c3e6cb;
+      border-radius: 4px;
+      text-align: center;
+    }
+    
+    .field-error {
+      color: #dc3545;
+      font-size: 13px;
+      margin-top: 5px;
+      margin-bottom: 10px;
+    }
+    
+    input.error {
+      border: 2px solid #dc3545 !important;
+    }
+
+body
+  .login-box
+    h2 LOGIN
+    
+    #errorMessage.error-message(style='display: none;')
+    #successMessage.success-message(style='display: none;')
+    
+    form#loginForm(action='/login' method='post')
+      input#email(type='text' name='email' placeholder='Enter email')
+      .field-error#emailError(style='display: none;')
+      
+      input#password(type='password' name='password' placeholder='Enter password')
+      .field-error#passwordError(style='display: none;')
+      
+      button(type='submit') Login
+
+  script.
+    document.getElementById('loginForm').addEventListener('submit', async function(event) {
+      event.preventDefault();
+      
+      document.getElementById('errorMessage').style.display = 'none';
+      document.getElementById('successMessage').style.display = 'none';
+      document.getElementById('emailError').style.display = 'none';
+      document.getElementById('passwordError').style.display = 'none';
+      document.getElementById('email').classList.remove('error');
+      document.getElementById('password').classList.remove('error');
+      
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      
+      let hasError = false;
+      
+      if (!email) {
+        document.getElementById('emailError').textContent = 'Invalid field';
+        document.getElementById('emailError').style.display = 'block';
+        document.getElementById('email').classList.add('error');
+        hasError = true;
+      } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        document.getElementById('emailError').textContent = 'Invalid field';
+        document.getElementById('emailError').style.display = 'block';
+        document.getElementById('email').classList.add('error');
+        hasError = true;
+      }
+      
+      if (!password) {
+        document.getElementById('passwordError').textContent = 'Invalid field';
+        document.getElementById('passwordError').style.display = 'block';
+        document.getElementById('password').classList.add('error');
+        hasError = true;
+      } else if (password.length < 6) {
+        document.getElementById('passwordError').textContent = 'Invalid field';
+        document.getElementById('passwordError').style.display = 'block';
+        document.getElementById('password').classList.add('error');
+        hasError = true;
+      }
+      
+      if (hasError) return;
+      
+      try {
+        const response = await fetch('/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ email, password })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+          document.getElementById('successMessage').textContent = 'Login successful! Redirecting...';
+          document.getElementById('successMessage').style.display = 'block';
+          
+          setTimeout(() => {
+            window.location.href = data.redirectUrl || '/dashboard';
+          }, 1000);
+        } else {
+          document.getElementById('errorMessage').textContent = data.message || 'Login failed. Please try again.';
+          document.getElementById('errorMessage').style.display = 'block';
+        }
+      } catch (error) {
+        document.getElementById('errorMessage').textContent = 'An error occurred. Please try again.';
+        document.getElementById('errorMessage').style.display = 'block';
+      }
+    });

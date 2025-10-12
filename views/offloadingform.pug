@@ -1,76 +1,288 @@
-doctype html
-html
-head
-  meta(charset='UTF-8')
-  meta(name='viewport' content='width=device-width, initial-scale=1.0')
-  title MWF - Offloading form
+extends layout.pug
+
+block head
   link(rel='stylesheet' href='/css/offloadingform.css')
   link(href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css' rel='stylesheet')
+  style.
+    /* Error Field Styles - Clean and Simple */
+    .error-message {
+      color: #ef4444;
+      font-size: 13px;
+      margin-top: 4px;
+      font-weight: 500;
+    }
+
+    /* Error field styling - Red border */
+    input.error,
+    select.error,
+    textarea.error {
+      border: 2px solid #ef4444 !important;
+      background-color: #fff;
+    }
+
+    input.error:focus,
+    select.error:focus,
+    textarea.error:focus {
+      border-color: #ef4444 !important;
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+    }
+
+    /* Notification Styles */
+    .notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: white;
+      padding: 16px 24px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      z-index: 10000;
+      min-width: 300px;
+      max-width: 500px;
+      animation: slideIn 0.3s ease-out;
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateX(400px);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    @keyframes slideOut {
+      from {
+        transform: translateX(0);
+        opacity: 1;
+      }
+      to {
+        transform: translateX(400px);
+        opacity: 0;
+      }
+    }
+
+    .notification-success {
+      border-left: 4px solid #22c55e;
+    }
+
+    .notification-success i {
+      color: #22c55e;
+      font-size: 24px;
+    }
+
+    .notification-error {
+      border-left: 4px solid #ef4444;
+    }
+
+    .notification-error i {
+      color: #ef4444;
+      font-size: 24px;
+    }
+
+    .notification-info {
+      border-left: 4px solid #3b82f6;
+    }
+
+    .notification-info i {
+      color: #3b82f6;
+      font-size: 24px;
+    }
+
+    .notification span {
+      flex: 1;
+      color: #1f2937;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .notification-close {
+      background: none;
+      border: none;
+      color: #6b7280;
+      cursor: pointer;
+      padding: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: color 0.2s;
+    }
+
+    .notification-close:hover {
+      color: #1f2937;
+    }
+
+    /* Loading state for submit button */
+    .btn-primary:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .btn-primary.loading {
+      position: relative;
+      color: transparent;
+    }
+
+    .btn-primary.loading::after {
+      content: '';
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      top: 50%;
+      left: 50%;
+      margin-left: -8px;
+      margin-top: -8px;
+      border: 2px solid #ffffff;
+      border-radius: 50%;
+      border-top-color: transparent;
+      animation: spin 0.6s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* Mobile responsive notifications */
+    @media (max-width: 768px) {
+      .notification {
+        top: 10px;
+        right: 10px;
+        left: 10px;
+        min-width: auto;
+      }
+      
+      @keyframes slideIn {
+        from {
+          transform: translateY(-100px);
+          opacity: 0;
+        }
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+      
+      @keyframes slideOut {
+        from {
+          transform: translateY(0);
+          opacity: 1;
+        }
+        to {
+          transform: translateY(-100px);
+          opacity: 0;
+        }
+      }
+    }
+
+    /* Smooth transitions */
+    input, select, textarea {
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    /* Enhance existing alert styles */
+    .alert.alert-warning {
+      animation: fadeIn 0.3s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+block content
   nav.navbar
     .nav-brand
-    .nav-links
-    .buttons
+      i.fas.fa-boxes
+      | MWF Inventory
+    .nav-buttons
       a(href='/attendant')
         i.fas.fa-home
-        |  Dashboard
+        | Dashboard
       a.logout(href='/login')
         i.fas.fa-sign-out-alt
-        |  Logout
+        | Logout
+
   .container.fade-in
     .dashboard-page
       .dashboard-grid
         
-        //- Offloading Operations Card
         .card.offloading-card
           .card-header
             .card-icon
               i.fas.fa-truck-ramp
             .card-title
-              h3 New Offloading Operation
+              h3 NEW OFFLOADING OPERATION
               p Record products being offloaded from delivery
           .card-content
-            form#offloadingForm( action='/offloadingform' method='POST')
+            form#offloadingForm(action='/offloadingform' method='POST')
               .form-grid
                 
-                //- Delivery Reference Section
                 .form-section
                   .section-header
                     i.fas.fa-clipboard-list
                     h4 Delivery Information
                   .form-group
                     label(for='deliveryReference') Delivery Reference
-                    input#deliveryReference(type='text' name='deliveryReference' placeholder='Loading reference number or ID' required)
+                    input#deliveryReference(type='text' name='deliveryReference' placeholder='Loading reference number or ID')
                     small.help-text Enter the loading operation ID or reference number
                   
                   .form-row
                     .form-group
                       label(for='offloadingDate') Offloading Date & Time
-                      input#offloadingDate(type='datetime-local' name='offloadingDate' required)
+                      input#offloadingDate(type='datetime-local' name='offloadingDate')
                     
                     .form-group
                       label(for='vehicleInfo') Vehicle Information
-                      input#vehicleInfo(type='text' name='vehicleInfo' placeholder='Vehicle plate/ID' required)
+                      input#vehicleInfo(type='text' name='vehicleInfo' placeholder='Vehicle plate/ID')
                   
-                  .form-group
-                    label(for='driverName') Driver Name
-                    input#driverName(type='text' name='driverName' placeholder='Driver name' required)
+                  .form-row
+                    .form-group
+                      label(for='driverName') Driver Name
+                      input#driverName(type='text' name='driverName' placeholder='Driver name')
+                    
+                    .form-group
+                      label(for='attendantName') Attendant Name
+                      input#attendantName(type='text' name='attendantName' placeholder='Attendant handling offloading' value=user.fullName || user.username)
 
-                //- Product Verification Section
                 .form-section
                   .section-header
                     i.fas.fa-boxes
                     h4 Product Verification
                   .form-group
                     label(for='productCategory') Product Category
-                    select#productCategory(name='productCategory' required)
-                      option(value='') Select category...
-                      option(value='timber') Wood Products (Timber, Poles, Hard/Soft woods)
-                      option(value='furniture') Furniture (Beds, Sofas, Tables, Cupboards)
-                      option(value='other') Other Products
+                    select#productCategory(name='productCategory')
+                      option(value='') Select category
+                      option(value='timber') Wood Products 
+                      option(value='home furniture') Home Furniture 
+                      option(value='office furniture') Office furniture
                   
                   .form-group
-                    label(for='productName') Product Name/Description
-                    input#productName(type='text' name='productName' placeholder='Product details' required)
+                    label(for='productName') Product Name
+                    select#productName(name='productName')
+                      option(value='') select product 
+                      option(value='timber') Timber 
+                      option(value='beds') Beds
+                      option(value='poles') Poles 
+                      option(value='sofas') Sofas 
+                      option(value='hardwood') Hardwood
+                      option(value='dinning tables') Dinning Tables
+                      option(value='cupboards') Cupboards 
+                      option(value='Softwoods') Softwoods 
+                      option(value='drawers') Drawers
                   
                   .form-row
                     .form-group
@@ -80,13 +292,13 @@ head
                     
                     .form-group
                       label(for='actualQuantity') Actual Quantity Received
-                      input#actualQuantity(type='number' name='actualQuantity' min='0' required)
+                      input#actualQuantity(type='number' name='actualQuantity' min='0')
                       small.help-text What was actually received
                   
                   .form-row
                     .form-group
                       label(for='unit') Unit of Measurement
-                      select#unit(name='unit' required)
+                      select#unit(name='unit')
                         option(value='') Select unit...
                         option(value='pieces') Pieces
                         option(value='kg') Kilograms
@@ -96,7 +308,7 @@ head
                     
                     .form-group
                       label(for='discrepancy') Quantity Status
-                      select#discrepancy(name='discrepancy' required onchange='toggleDiscrepancyAlert(this)')
+                      select#discrepancy(name='discrepancy')
                         option(value='') Check quantities...
                         option(value='match') ✓ Quantities Match
                         option(value='shortage') ⚠ Shortage (Less than expected)
@@ -106,14 +318,13 @@ head
                     i.fas.fa-exclamation-triangle
                     span Please document the quantity discrepancy in additional notes
 
-                //- Condition Assessment Section
                 .form-section
                   .section-header
                     i.fas.fa-search
                     h4 Product Condition Assessment
                   .form-group
                     label(for='productCondition') Overall Condition
-                    select#productCondition(name='productCondition' required onchange='toggleDamageFields(this)')
+                    select#productCondition(name='productCondition')
                       option(value='') Assess condition...
                       option(value='excellent') ✓ Excellent - No issues
                       option(value='good') ✓ Good - Minor wear
@@ -133,19 +344,14 @@ head
                           i.fas.fa-camera
                           | Photos required for damage documentation
 
-                //- Offloading Details Section
                 .form-section
                   .section-header
                     i.fas.fa-warehouse
                     h4 Offloading Details
                   .form-row
                     .form-group
-                      label(for='attendantName') Receiving Attendant
-                      input#attendantName(type='text' name='attendantName' placeholder='Your name' required)
-                    
-                    .form-group
                       label(for='storageLocation') Storage Location
-                      input#storageLocation(type='text' name='storageLocation' placeholder='Where products will be stored' required)
+                      input#storageLocation(type='text' name='storageLocation' placeholder='Where products will be stored')
                   
                   .form-group
                     label(for='receivedBy') Received By (Customer/Staff)
@@ -155,7 +361,6 @@ head
                     label(for='additionalNotes') Additional Notes
                     textarea#additionalNotes(name='additionalNotes' rows='4' placeholder='Any additional observations, discrepancy explanations, or special notes...')
 
-              //- Form Actions
               .card-actions
                 a.btn-secondary(href='/attendantstock')
                   i.fas.fa-arrow-left
@@ -164,58 +369,195 @@ head
                   i.fas.fa-check-circle
                   | Complete Offloading
 
-  //- //- JavaScript for form interactions
-  //- script.
-  //-   // Set current date/time as default
-  //-   document.addEventListener('DOMContentLoaded', function() {
-  //-     const now = new Date();
-  //-     now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-  //-     document.getElementById('offloadingDate').value = now.toISOString().slice(0, 16);
-  //-   });
-    
-  //-   // Toggle discrepancy alert
-  //-   function toggleDiscrepancyAlert(select) {
-  //-     const alert = document.getElementById('discrepancyAlert');
-  //-     if (select.value === 'shortage' || select.value === 'excess') {
-  //-       alert.style.display = 'block';
-  //-     } else {
-  //-       alert.style.display = 'none';
-  //-     }
-  //-   }
-    
-  //-   // Toggle damage fields
-  //-   function toggleDamageFields(select) {
-  //-     const damageFields = document.getElementById('damageFields');
-  //-     if (select.value === 'fair' || select.value === 'poor' || select.value === 'damaged') {
-  //-       damageFields.style.display = 'block';
-  //-       document.getElementById('damageDescription').required = true;
-  //-     } else {
-  //-       damageFields.style.display = 'none';
-  //-       document.getElementById('damageDescription').required = false;
-  //-     }
-  //-   }
-    
-  //-   // Auto-calculate discrepancy
-  //-   function checkQuantities() {
-  //-     const expected = parseInt(document.getElementById('expectedQuantity').value) || 0;
-  //-     const actual = parseInt(document.getElementById('actualQuantity').value) || 0;
-  //-     const discrepancySelect = document.getElementById('discrepancy');
+  script.
+    // Show notification function
+    function showNotification(message, type = 'success') {
+      const existingNotification = document.querySelector('.notification');
+      if (existingNotification) {
+        existingNotification.remove();
+      }
+
+      const notification = document.createElement('div');
+      notification.className = `notification notification-${type}`;
+      notification.innerHTML = `
+        <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+        <span>${message}</span>
+        <button class="notification-close" onclick="this.parentElement.remove()">
+          <i class="fas fa-times"></i>
+        </button>
+      `;
       
-  //-     if (expected > 0 && actual > 0) {
-  //-       if (actual === expected) {
-  //-         discrepancySelect.value = 'match';
-  //-       } else if (actual < expected) {
-  //-         discrepancySelect.value = 'shortage';
-  //-       } else {
-  //-         discrepancySelect.value = 'excess';
-  //-       }
-  //-       toggleDiscrepancyAlert(discrepancySelect);
-  //-     }
-  //-   }
-    
-  //-   // Add event listeners for quantity auto-check
-  //-   document.getElementById('expectedQuantity').addEventListener('input', checkQuantities);
-  //-   document.getElementById('actualQuantity').addEventListener('input', checkQuantities);
+      document.body.appendChild(notification);
+      
+      setTimeout(() => {
+        if (notification.parentElement) {
+          notification.style.animation = 'slideOut 0.3s ease-out';
+          setTimeout(() => notification.remove(), 300);
+        }
+      }, 5000);
+    }
 
+    // Show field error
+    function showFieldError(fieldId, message = 'This field is required') {
+      const field = document.getElementById(fieldId);
+      if (!field) return;
+      
+      const existingError = field.parentElement.querySelector('.error-message');
+      if (existingError) {
+        existingError.remove();
+      }
+      
+      field.classList.add('error');
+      
+      const errorDiv = document.createElement('div');
+      errorDiv.className = 'error-message';
+      errorDiv.textContent = message;
+      field.parentElement.appendChild(errorDiv);
+      
+      field.addEventListener('input', function() {
+        this.classList.remove('error');
+        const error = this.parentElement.querySelector('.error-message');
+        if (error) error.remove();
+      }, { once: true });
+      
+      if (field.tagName === 'SELECT') {
+        field.addEventListener('change', function() {
+          this.classList.remove('error');
+          const error = this.parentElement.querySelector('.error-message');
+          if (error) error.remove();
+        }, { once: true });
+      }
+    }
 
-    
+    // Clear all field errors
+    function clearAllErrors() {
+      document.querySelectorAll('.error').forEach(field => {
+        field.classList.remove('error');
+      });
+      document.querySelectorAll('.error-message').forEach(error => {
+        error.remove();
+      });
+    }
+
+    // Validate delivery reference
+    function validateDeliveryReference(value) {
+      return value && value.trim().length >= 3;
+    }
+
+    // Validate date
+    function validateOffloadingDate(value) {
+      if (!value) return { valid: false, message: 'Date is required' };
+      
+      const selectedDate = new Date(value);
+      const now = new Date();
+      
+      if (selectedDate > now) {
+        return { valid: false, message: 'Date cannot be in the future' };
+      }
+      
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+      
+      if (selectedDate < thirtyDaysAgo) {
+        return { valid: false, message: 'Date cannot be more than 30 days old' };
+      }
+      
+      return { valid: true };
+    }
+
+    // Validate text fields
+    function validateTextField(value, minLength = 2) {
+      return value && value.trim().length >= minLength;
+    }
+
+    // Validate driver name
+    function validateDriverName(value) {
+      if (!value || value.trim().length < 2) {
+        return { valid: false, message: 'Driver name is required (min 2 characters)' };
+      }
+      if (!/^[a-zA-Z\s]+$/.test(value.trim())) {
+        return { valid: false, message: 'Driver name should only contain letters' };
+      }
+      return { valid: true };
+    }
+
+    // Validate quantities
+    function validateQuantities() {
+      const expected = parseInt(document.getElementById('expectedQuantity').value) || 0;
+      const actual = parseInt(document.getElementById('actualQuantity').value) || 0;
+      const discrepancy = document.getElementById('discrepancy').value;
+      
+      if (actual <= 0) {
+        return { field: 'actualQuantity', valid: false, message: 'Actual quantity must be greater than 0' };
+      }
+      
+      if (expected > 0) {
+        if (actual === expected && discrepancy !== 'match') {
+          return { field: 'discrepancy', valid: false, message: 'Select "Quantities Match" - they are equal' };
+        }
+        
+        if (actual < expected && discrepancy !== 'shortage') {
+          return { field: 'discrepancy', valid: false, message: 'Select "Shortage" - received less than expected' };
+        }
+        
+        if (actual > expected && discrepancy !== 'excess') {
+          return { field: 'discrepancy', valid: false, message: 'Select "Excess" - received more than expected' };
+        }
+      }
+      
+      return { valid: true };
+    }
+
+    // Validate condition assessment
+    function validateConditionAssessment() {
+      const condition = document.getElementById('productCondition').value;
+      const damageDescription = document.getElementById('damageDescription').value;
+      
+      if (['fair', 'poor', 'damaged'].includes(condition)) {
+        if (!damageDescription || damageDescription.trim().length < 10) {
+          return { valid: false, message: 'Damage description required (min 10 characters)' };
+        }
+      }
+      
+      return { valid: true };
+    }
+
+    // Main form validation
+    function validateForm(e) {
+      e.preventDefault();
+      clearAllErrors();
+      
+      let hasErrors = false;
+      let firstErrorField = null;
+      
+      // Validate delivery reference
+      if (!validateDeliveryReference(document.getElementById('deliveryReference').value)) {
+        showFieldError('deliveryReference', 'Delivery reference is required (min 3 characters)');
+        hasErrors = true;
+        firstErrorField = firstErrorField || 'deliveryReference';
+      }
+      
+      // Validate offloading date
+      const dateValidation = validateOffloadingDate(document.getElementById('offloadingDate').value);
+      if (!dateValidation.valid) {
+        showFieldError('offloadingDate', dateValidation.message);
+        hasErrors = true;
+        firstErrorField = firstErrorField || 'offloadingDate';
+      }
+      
+      // Validate vehicle info
+      if (!validateTextField(document.getElementById('vehicleInfo').value)) {
+        showFieldError('vehicleInfo', 'Vehicle information is required');
+        hasErrors = true;
+        firstErrorField = firstErrorField || 'vehicleInfo';
+      }
+      
+      // Validate driver name
+      const driverValidation = validateDriverName(document.getElementById('driverName').value);
+      if (!driverValidation.valid) {
+        showFieldError('driverName', driverValidation.message);
+        hasErrors = true;
+        firstErrorField = firstErrorField || 'driverName';
+      }
+      
+      // Validate attendant

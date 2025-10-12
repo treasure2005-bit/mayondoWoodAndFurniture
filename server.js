@@ -1,4 +1,4 @@
-// 1 . Dependencies
+// 1. Dependencies
 const express = require("express");
 const path = require("path");
 const mongoose = require("mongoose");
@@ -12,8 +12,8 @@ require("dotenv").config();
 
 // import models
 const UserModel = require("./models/userModel");
-const attendantstockModel = require("./models/attendantstockModel")
-
+const attendantstockModel = require("./models/attendantstockModel");
+const offloadingModel = require("./models/offloadingModel");
 
 // import routes
 const dashboardRoutes = require("./routes/dashboardRoutes");
@@ -23,16 +23,16 @@ const salesRoutes = require("./routes/salesRoutes");
 const stockRoutes = require("./routes/stockRoutes");
 const userRoutes = require("./routes/userRoutes");
 const attendantstockRoutes = require("./routes/attendantstockRoutes");
-const reportsRoutes = require("./routes/reportsRoutes")
+const reportsRoutes = require("./routes/reportsRoutes");
 const suppliersRoutes = require("./routes/suppliersRoutes");
 const stockreportRoutes = require("./routes/stockreportRoutes");
+const offloadingRoutes = require("./routes/offloadingRoutes");
 
-
-// 2 . Instantiations
+// 2. Instantiations
 const app = express();
 const port = 3000;
 
-// 3 . Configurations
+// 3. Configurations
 app.locals.moment = moment;
 //SETTING UP MONGODB CONNECTIONS
 mongoose.connect(process.env.MONGODB_URL, {
@@ -52,7 +52,7 @@ mongoose.connection
 app.set("view engine", "pug");
 app.set("views", path.join(__dirname, "views"));
 
-// 4 . Middleware
+// 4. Middleware
 // app.use(express.static("public"));
 app.use(express.static(path.join(__dirname, "public")));
 app.use("/public/uploads", express.static(__dirname + "/public/uploads"));
@@ -77,7 +77,7 @@ passport.use(UserModel.createStrategy());
 passport.serializeUser(UserModel.serializeUser());
 passport.deserializeUser(UserModel.deserializeUser());
 
-// 5 . Routes
+// 5. Routes
 //USING IMPORTED ROUTES
 
 // app.use("/",studyRoutes)
@@ -91,13 +91,13 @@ app.use("/", attendantstockRoutes);
 app.use("/", reportsRoutes);
 app.use("/", suppliersRoutes);
 app.use("/", stockreportRoutes);
-
+app.use("/", offloadingRoutes);
 
 //non existent route handler Second last
 app.use((req, res) => {
-  res.status(404).send("Oops! Route not found.");
+  res.status(404).send("Oops! Route not found.");
 });
 
-// 6 . Bootstrapping Server
+// 6. Bootstrapping Server
 //this should always be the last line in this file.
 app.listen(port, () => console.log(`listening on port ${port}`));

@@ -1,33 +1,99 @@
-doctype html
-html
-  head
-    title All Loadings
-    link(rel='stylesheet' href='/css/loadinglist.css')
-  body
-    .container
-      h2 All Loading Operations
+extends layout.pug
+
+block head
+  link(rel='stylesheet' href='/css/loadinglist.css')
+  link(href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css' rel='stylesheet')
+
+block content
+  nav.navbar
+    .navbar-container
+      .navbar-brand
+        i.fas.fa-truck-loading
+        span.brand-text LOADING SYSTEM
+      
+      .navbar-menu
+        a.nav-link(href='/attendant')
+          i.fas.fa-home
+          span Dashboard
+        a.nav-link(href='/loadingform')
+          i.fas.fa-plus-circle
+          span New Loading
+        a.nav-link(href='/attendantstock')
+          i.fas.fa-boxes
+          span Stock
+        a.nav-link(href='/recordingSales')
+          i.fas.fa-cash-register
+          span Sales
+        a.nav-link(href='/suppliersTable')
+          i.fas.fa-users
+          span Suppliers
+      
+      .navbar-user
+        .user-info
+          i.fas.fa-user-circle
+          if user
+            span= user.fullName || user.username
+          else
+            span User
+        a.logout-btn(href='/logout')
+          i.fas.fa-sign-out-alt
+          span Logout
+
+  .container
+    .header-section
+      h2 ALL LOADING OPERATIONS
+      a.btn-add-loading(href='/loadingform')
+        i.fas.fa-plus-circle
+        |  ADD LOADING
+    
+    if loadings && loadings.length > 0
       table
         thead
           tr
-            th Date
-            th Vehicle
-            th Driver
-            th Destination
-            th Product
-            th Qty
-            th Unit
-            th Actions
+            th DATE & TIME
+            th VEHICLE
+            th DRIVER
+            th DESTINATION
+            th PRODUCT
+            th CATEGORY
+            th QTY
+            th UNIT
+            th ATTENDANT
+            th PRIORITY
+            th ACTIONS
         tbody
           each loading in loadings
             tr
-              td= loading.loadingDate
+              td= new Date(loading.loadingDate).toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' })
               td= loading.vehicleInfo
               td= loading.driverName
               td= loading.destination
               td= loading.productName
+              td= loading.productCategory
               td= loading.quantity
               td= loading.unit
+              td= loading.attendantName
               td
-                a(href=`/loadingform/${loading._id}/edit`) Edit
-                form(action=`/loadingform/${loading._id}/delete` method='POST' style='display:inline;')
-                  button(type='submit' onclick='return confirm("Delete this record?")') Delete
+                if loading.priority === 'urgent'
+                  span.priority-badge.priority-urgent URGENT
+                else if loading.priority === 'low'
+                  span.priority-badge.priority-low LOW
+                else
+                  span.priority-badge.priority-normal NORMAL
+              td
+                .actions-cell
+                  a.btn-edit(href=`/loadingform/${loading._id}/edit`)
+                    i.fas.fa-edit
+                    |  EDIT
+                  form(action=`/loadingform/${loading._id}/delete` method='POST' style='display:inline;margin:0;')
+                    button.btn-delete(type='submit' onclick='return confirm("Delete this loading record?")')
+                      i.fas.fa-trash
+                      |  DELETE
+    else
+      .empty-state
+        p
+          i.fas.fa-inbox(style='font-size: 48px; color: #ccc; margin-bottom: 20px; display: block;')
+        p No loading operations found
+        a.btn-primary(href='/loadingform' style='display:inline-block;background:#28a745;color:white;padding:12px 24px;text-decoration:none;border-radius:6px;font-weight:600;margin-top:15px;')
+          i.fas.fa-plus
+          |  Create First Loading Operation
