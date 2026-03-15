@@ -1,5 +1,7 @@
 const mongoose = require("mongoose");
-const passportLocalMongoose = require("passport-local-mongoose");
+const passportLocalMongoose =
+  require("passport-local-mongoose").default ||
+  require("passport-local-mongoose");
 
 const signupSchema = new mongoose.Schema(
   {
@@ -27,11 +29,11 @@ const signupSchema = new mongoose.Schema(
     },
   },
   {
-    timestamps: true, // This adds createdAt and updatedAt automatically
-  }
+    timestamps: true,
+  },
 );
 
-// This tells passport to use email field instead of username
+// tell passport to use email as username
 signupSchema.plugin(passportLocalMongoose, {
   usernameField: "email",
 });

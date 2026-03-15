@@ -4,7 +4,7 @@ const path = require("path");
 const mongoose = require("mongoose");
 const passport = require("passport");
 const expressSession = require("express-session");
-const MongoStore = require("connect-mongo");
+const MongoStore = require("connect-mongo").default;
 const moment = require("moment");
 const methodOverride = require("method-override");
 
