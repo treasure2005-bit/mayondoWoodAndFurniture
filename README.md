@@ -10,6 +10,7 @@ A full-stack web application where workers get to keep track and record wood and
 - Server-side rendered pages with Pug templates
 - RESTful API routes with Express middleware
 - MongoDB database for products and orders
+- Adding new attendants
 
 ## Tech Stack
 
